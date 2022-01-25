@@ -130,3 +130,6 @@ dmypy.json
 
 # My file
 .DS_Store
+local_script.py
+
+csv
