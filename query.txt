@@ -1,0 +1,60 @@
+CREATE TABLE IF NOT EXISTS `mydb`.`CUSTOMER` (
+  `id_customer` INT NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_customer`))
+ENGINE = InnoDB
+
+CREATE TABLE IF NOT EXISTS `mydb`.`CAFE` (
+  `id_cafe` INT NOT NULL,
+  `name_cafe` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_cafe`))
+ENGINE = InnoDB
+
+CREATE TABLE IF NOT EXISTS `mydb`.`ORDERS` (
+  `id_order` INT NOT NULL AUTO_INCREMENT,
+  `id_cafe` INT NOT NULL,
+  `id_customer` INT NOT NULL,
+  `date` DATE NOT NULL,
+  `payment_type` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_order`),
+  INDEX `id_cafe _idx` (`id_cafe` ASC) VISIBLE,
+  INDEX `id_customer _idx` (`id_customer` ASC) VISIBLE,
+  CONSTRAINT `id_cafe `
+    FOREIGN KEY (`id_cafe`)
+    REFERENCES `mydb`.`CAFE` (`id_cafe`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_customer `
+    FOREIGN KEY (`id_customer`)
+    REFERENCES `mydb`.`CUSTOMER` (`id_customer`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+CREATE TABLE IF NOT EXISTS `mydb`.`ORDERS_PRODUCT` (
+  `id_order` INT NOT NULL,
+  `id_product` INT NOT NULL,
+  INDEX `id_order_idx` (`id_order` ASC) VISIBLE,
+  INDEX `id_product_idx` (`id_product` ASC) VISIBLE,
+  CONSTRAINT `id_order`
+    FOREIGN KEY (`id_order`)
+    REFERENCES `mydb`.`ORDERS` (`id_order`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_product`
+    FOREIGN KEY (`id_product`)
+    REFERENCES `mydb`.`PRODUCTS` (`products_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+
+CREATE TABLE IF NOT EXISTS `mydb`.`PRODUCTS` (
+  `products_id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `size` VARCHAR(45) NULL,
+  `flavor` VARCHAR(45) NULL,
+  `price` FLOAT NOT NULL,
+  PRIMARY KEY (`products_id`))
+ENGINE = InnoDB
+
