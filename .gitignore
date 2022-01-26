@@ -134,3 +134,5 @@ local_script.py
 
 csv
 final-project.pdf
+.data
+.env

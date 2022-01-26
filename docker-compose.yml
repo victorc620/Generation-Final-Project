@@ -14,7 +14,9 @@ services:
       POSTGRES_USER: team4gp
       POSTGRES_PASSWORD: team4pw
     volumes:
-      - ./data:/var/lib/postgresql
+      - ./.data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
   adminer:
     image: adminer
