@@ -27,8 +27,7 @@ services:
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
     ports:
-      - 5432:5432
-  adminer:
+      - 5432:543  adminer:
     image: adminer
     container_name: adminer_postgresql
     restart: always
