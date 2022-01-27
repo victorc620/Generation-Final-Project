@@ -4,4 +4,4 @@
 
 python3 src.app.py
 
-xfun::embed_file("Schema_Database_Cafe.pdf")
+![database]("Schema_Database_Cafe.pdf")
