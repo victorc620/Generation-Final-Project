@@ -16,16 +16,26 @@ def products_price_explode(df_arg):
     return df_arg
 
 def add_product_price_colume(df_arg):
-    "Add 'product_price' colume for product price"
+    """
+    Add 'product_price' colume for product price
+    Rename column "products+price" to "products"
+    """
     df_arg["product_price"] = df_arg["products+price"].str.split(" - ").str[-1]
     df_arg = remove_price_from_products(df_arg)
+    df_arg.rename(columns={'products+price':'products'}, inplace=True)
     return df_arg
 
 def remove_price_from_products(df_arg):
     df_arg["products+price"] = df_arg["products+price"].map(lambda x:x.rstrip(' -0123456789.'))
     return df_arg
 
+def seperate_date_time(df_arg):
+    df_arg["date"] = df_arg["datetime"].str.split(" ").str[0]
+    df_arg["time"] = df_arg["datetime"].str.split(" ").str[1]
+    df_arg.drop("datetime", inplace=True, axis =1)
+    return df_arg
+
 df_1nf = products_price_explode(df)
 d1_inf = add_product_price_colume(df_1nf)
+df_1nf = seperate_date_time(df_1nf)
 print(df_1nf)
-
