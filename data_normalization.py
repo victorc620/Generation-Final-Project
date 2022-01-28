@@ -34,6 +34,7 @@ def products_price_explode(df_arg: pd.DataFrame, column:str, split_criteria:str)
     df_func[column] = df_func[column].map(str)
     df_func[column] = df_func[column].str.split(split_criteria)
     df_func = df_func.explode(column)
+    print(df_func)
     return df_func
 
 def add_product_price_colume(df_arg: pd.DataFrame):
@@ -56,13 +57,19 @@ def load_csv_to_df(path:str):
     df = pd.read_csv(path, names = ["datetime","Location","fullname", "products+price", "total_price","payment_type","card_number"])
     return df
 
+def copy_of_original_data(df_arg):
+    df_copy = df_arg.copy()
+    return df_copy
+#------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
 df_original = load_csv_to_df('./csv/chesterfield_25-08-2021_09-00-00.csv')
 
 # Perform data_normalization
-df_transformed = products_price_explode(df_original, "products+price", ",")
-df_transformed = add_product_price_colume(df_transformed)
+
+df_transformed = copy_of_original_data(df_original)
 df_transformed = create_hash_id(df_transformed)
+df_transformed = products_price_explode(df_transformed, "products+price", ",")
+df_transformed = add_product_price_colume(df_transformed)
 df_transformed = drop_column(df_transformed, "card_number")
 df_transformed = drop_column(df_transformed, "fullname")
 df_transformed = set_index(df_transformed, "id")
