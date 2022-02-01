@@ -1,8 +1,5 @@
 import pandas as pd
 import hashlib
-# from pandas.util import hash_pandas_object
-# from base64 import encode
-# import numpy as np
 
 def create_hash_id(df_arg: pd.DataFrame):
     """
@@ -11,12 +8,6 @@ def create_hash_id(df_arg: pd.DataFrame):
     """
     df_arg["id"]=df_arg.astype(str).sum(1).apply(lambda x:hashlib.md5(x.encode()).hexdigest())
     return df_arg
-
-    # Backup ONLY, please ignore
-    # df_arg["id"] = hash_pandas_object(df_arg)
-    # df_arg["id"]=df_arg.astype(str).sum(1).str.encode('utf-8').apply(hashlib.md5)
-    # df_arg["id"]=df_arg.astype(str).sum(1).apply(hash)
-    # df_arg["id"]=df_arg["id"].astype(int).apply(abs)
 
 def drop_column(df_arg: pd.DataFrame, column:str):
     "Drop any column in the DataFrame"
@@ -60,12 +51,12 @@ def load_csv_to_df(path:str):
 def copy_of_original_data(df_arg):
     df_copy = df_arg.copy()
     return df_copy
+
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
 df_original = load_csv_to_df('./csv/chesterfield_25-08-2021_09-00-00.csv')
 
 # Perform data_normalization
-
 df_transformed = copy_of_original_data(df_original)
 df_transformed = create_hash_id(df_transformed)
 df_transformed = products_price_explode(df_transformed, "products+price", ",")
@@ -74,3 +65,7 @@ df_transformed = drop_column(df_transformed, "card_number")
 df_transformed = drop_column(df_transformed, "fullname")
 df_transformed = set_index(df_transformed, "id")
 print(df_transformed)
+
+products_list = df_transformed["products"].unique()
+print(products_list)
+print(len(products_list))
