@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import datetime
 
 custom_date_parser = lambda x: datetime.strptime(x, "%d/%m/%Y %H:%M")
-transactions_df = pd.read_csv('team-4-project/chesterfield_25-08-2021_09-00-00.csv', index_col= False, names = ["datetime","location","fullname", "productsprice", "total_price","payment_type","card_number"], parse_dates=['datetime'],
+transactions_df = pd.read_csv('src/team-4-project/chesterfield_25-08-2021_09-00-00.csv', index_col= False, names = ["datetime","location","fullname", "productsprice", "total_price","payment_type","card_number"], parse_dates=['datetime'],
                 date_parser=custom_date_parser)
 # missing port from coonn_params see other files for example
 conn_params = {
