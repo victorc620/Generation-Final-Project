@@ -3,8 +3,8 @@ import sys
 # import the connect library for psycopg2
 import psycopg2
 # import the error handling libraries for psycopg2
-from psycopg2 import OperationalError, errorcodes, errors
-import psycopg2.extras as extras
+from psycopg2 import OperationalError
+import psycopg2.extras
 import pandas as pd
 from datetime import datetime
 
