@@ -66,6 +66,17 @@ df_transformed = drop_column(df_transformed, "fullname")
 df_transformed = set_index(df_transformed, "id")
 print(df_transformed)
 
-products_list = df_transformed["products"].unique()
-print(products_list)
-print(len(products_list))
+# products_list = df_transformed["payment_type"].unique()
+# print(products_list)
+# print(len(products_list))
+
+# temp_df = df_transformed[["datetime", "products"]]
+# print(temp_df)
+
+# tpls = [tuple(x) for x in temp_df.to_numpy()]
+# print(tpls[0:2])
+# cols = ','.join(list(temp_df.columns))
+# print(cols)
+
+# print(type(temp_df))
+# print(type(df_transformed))
