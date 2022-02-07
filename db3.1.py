@@ -4,17 +4,16 @@ import sys
 import psycopg2
 # import the error handling libraries for psycopg2
 from psycopg2 import OperationalError
-import psycopg2.extras
+import psycopg2.extras as extras
 import pandas as pd
-from datetime import datetime
 
-custom_date_parser = lambda x: datetime.strptime(x, "%d/%m/%Y %H:%M")
-transactions_df = pd.read_csv('src/team-4-project/chesterfield_25-08-2021_09-00-00.csv', index_col= False, names = ["datetime","location","fullname", "productsprice", "total_price","payment_type","card_number"], parse_dates=['datetime'],
-                date_parser=custom_date_parser)
+from data_normalization import temp
+
+
 # missing port from coonn_params see other files for example
 conn_params = {
     "host"      : "localhost",
-    "database"  : "testing",
+    "database"  : "test2",
     "user"      : "team4gp",
     "password"  : "team4pw"
 }
@@ -47,25 +46,46 @@ def connect(conn_params):
     return conn
 
 # Define function using cursor.executemany() to insert the dataframe
-def execute_many(conn, datafrm, table):
+# def execute_many(conn, datafrm, table):
+#     # Creating a list of tupples from the dataframe values
+#     tpls = [tuple(x) for x in datafrm.to_numpy()]
+#     # dataframe columns with Comma-separated
+#     cols = ','.join(list(datafrm.columns))
+#     # SQL query to execute
+#     sql = "INSERT INTO %s(%s) VALUES(%%s,%%s,%%s,%%s)" % (table, cols)
+#     cursor = conn.cursor()
+#     try:
+#         cursor.executemany(sql, tpls)
+#         conn.commit()
+#         print("Data inserted using execute_many() successfully...")
+#     except (Exception, psycopg2.DatabaseError) as err:
+#         # pass exception to function
+#         show_psycopg2_exception(err)
+#         cursor.close()
+        
+# Define function using psycopg2.extras.execute_values() to insert the dataframe.
+def execute_values(conn, datafrm, table):
     # Creating a list of tupples from the dataframe values
     tpls = [tuple(x) for x in datafrm.to_numpy()]
     # dataframe columns with Comma-separated
     cols = ','.join(list(datafrm.columns))
     # SQL query to execute
-    sql = "INSERT INTO %s(%s) VALUES(%%s,%%s,%%s,%%s,%%s,%%s,%%s)" % (table, cols)
+    sql = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
     cursor = conn.cursor()
     try:
-        cursor.executemany(sql, tpls)
-        conn.commit()
-        print("Data inserted using execute_many() successfully...")
+        extras.execute_values(cursor, sql, tpls)
+        print("Data inserted using execute_values() successfully..")
     except (Exception, psycopg2.DatabaseError) as err:
         # pass exception to function
         show_psycopg2_exception(err)
         cursor.close()
 
+
+
 # Connect to the database
 conn = connect(conn_params)
 conn.autocommit = True
 # Run the execute_many method
-execute_many(conn, transactions_df, 'maintable6')
+# execute_many(conn, producttable, 'test')
+temp = temp[~temp.Key.isin(temp_df.Key)]
+execute_values(conn, temp_df, 'cafe')
