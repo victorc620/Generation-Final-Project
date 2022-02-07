@@ -55,6 +55,10 @@ def copy_of_original_data(df_arg):
     df_copy = df_arg.copy()
     return df_copy
 
+def clean_spaces(df_args):
+    df_args['products'] = df_args['products'].map(lambda x:x.lstrip())
+    return df_args
+
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
 df_original = load_csv_to_df('team-4-project/src/chesterfield_25-08-2021_09-00-00.csv')
@@ -67,7 +71,9 @@ df_transformed = add_product_price_colume(df_transformed)
 df_transformed = drop_column(df_transformed, "card_number")
 df_transformed = drop_column(df_transformed, "fullname")
 df_transformed = set_index(df_transformed, "order_id")
-# print(df_transformed)
+df_transformed = clean_spaces(df_transformed)
+print(df_transformed) 
+
 
 # products_list = df_transformed["payment_type"].unique()
 # print(products_list)
