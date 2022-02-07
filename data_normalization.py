@@ -1,6 +1,9 @@
+from numpy import product
 import pandas as pd
 import hashlib
 from datetime import datetime
+import psycopg2
+from sqlalchemy import create_engine
 
 def create_hash_id(df_arg: pd.DataFrame):
     """
@@ -26,7 +29,6 @@ def products_price_explode(df_arg: pd.DataFrame, column:str, split_criteria:str)
     df_func[column] = df_func[column].map(str)
     df_func[column] = df_func[column].str.split(split_criteria)
     df_func = df_func.explode(column)
-    print(df_func)
     return df_func
 
 def add_product_price_colume(df_arg: pd.DataFrame):
@@ -61,7 +63,7 @@ def clean_spaces(df_args):
 
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
-df_original = load_csv_to_df('team-4-project/src/chesterfield_25-08-2021_09-00-00.csv')
+df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
 
 # Perform data_normalization
 df_transformed = copy_of_original_data(df_original)
@@ -72,20 +74,14 @@ df_transformed = drop_column(df_transformed, "card_number")
 df_transformed = drop_column(df_transformed, "fullname")
 df_transformed = set_index(df_transformed, "order_id")
 df_transformed = clean_spaces(df_transformed)
-print(df_transformed) 
 
+# Products table
+product_df = df_transformed[["products","product_price"]]
+product_df = product_df.drop_duplicates(subset=['products'])
+print(df_transformed["products"].unique())
+print(product_df)
 
-# products_list = df_transformed["payment_type"].unique()
-# print(products_list)
-# print(len(products_list))
-
-temp_df = df_transformed[["order_id","datetime", "payment_type", "total_price"]]
-print(temp_df)
-
-# tpls = [tuple(x) for x in temp_df.to_numpy()]
-# print(tpls[0:2])
-# cols = ','.join(list(temp_df.columns))
-# print(cols)
-
-# print(type(temp_df))
-# print(type(df_transformed))
+# Location Table
+loction_array = df_transformed["location"].unique()
+location_df = pd.DataFrame(loction_array, columns= ["location"])
+print(location_df)
