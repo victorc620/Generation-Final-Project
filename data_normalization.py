@@ -61,6 +61,16 @@ def clean_spaces(df_args):
     df_args['products'] = df_args['products'].map(lambda x:x.lstrip())
     return df_args
 
+def create_product_df(df_transformed):
+    product_df = df_transformed[["products","product_price"]]
+    product_df = product_df.drop_duplicates(subset=['products'])
+    return product_df
+
+def create_location_df(df_transformed):
+    loction_array = df_transformed["location"].unique()
+    location_df = pd.DataFrame(loction_array, columns= ["location"])
+    return location_df
+
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
 df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
@@ -74,14 +84,28 @@ df_transformed = drop_column(df_transformed, "card_number")
 df_transformed = drop_column(df_transformed, "fullname")
 df_transformed = set_index(df_transformed, "order_id")
 df_transformed = clean_spaces(df_transformed)
+print(df_transformed)
 
-# Products table
-product_df = df_transformed[["products","product_price"]]
-product_df = product_df.drop_duplicates(subset=['products'])
-print(df_transformed["products"].unique())
-print(product_df)
 
-# Location Table
-loction_array = df_transformed["location"].unique()
-location_df = pd.DataFrame(loction_array, columns= ["location"])
-print(location_df)
+product_df = create_product_df(df_transformed)
+location_df = create_location_df(df_transformed)
+
+# Upload location_df to SQL
+engine = create_engine("postgresql://team4gp:team4pw@localhost:5432")
+try:
+    location_df.to_sql("cafe", engine, if_exists="append", index=False)
+except:
+    pass
+
+# Download location_df to SQL
+location_df_from_sql = pd.read_sql("cafe", engine,index_col="cafe_id")
+print(location_df_from_sql)
+
+location_dict = location_df_from_sql.to_dict()["location"]
+location_dict = {y:x for x,y in location_dict.items()}
+print(location_dict)
+
+
+orders_df = copy_of_original_data(df_transformed)
+orders_df["location"].replace(location_dict, inplace=True)
+print(orders_df)
