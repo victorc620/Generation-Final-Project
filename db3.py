@@ -7,16 +7,9 @@ from psycopg2 import OperationalError
 import psycopg2.extras as extras
 import pandas as pd
 
-from data_normalization import temp
+from data_1 import *
 
 
-# missing port from coonn_params see other files for example
-conn_params = {
-    "host"      : "localhost",
-    "database"  : "test2",
-    "user"      : "team4gp",
-    "password"  : "team4pw"
-}
 
 def show_psycopg2_exception(err):
     # get details about the exception
@@ -32,7 +25,15 @@ def show_psycopg2_exception(err):
     print ("pgerror:", err.pgerror)
     print ("pgcode:", err.pgcode, "\n")
 
-def connect(conn_params):
+def connect():
+
+    conn_params = {
+        "host"      : "localhost",
+        "database"  : "cafe_intel",
+        "user"      : "root",
+        "password"  : "password"
+    }
+    
     """Connecting to Postgresql database server"""
     conn =None
     try:
@@ -65,11 +66,12 @@ def connect(conn_params):
         
 # Define function using psycopg2.extras.execute_values() to insert the dataframe.
 def execute_values(conn, datafrm, table):
+    import pdb; pdb.set_trace()
     # Creating a list of tupples from the dataframe values
     tpls = [tuple(x) for x in datafrm.to_numpy()]
     # dataframe columns with Comma-separated
     cols = ','.join(list(datafrm.columns))
-    # SQL query to execute
+    # SQL query to executes
     sql = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)
     cursor = conn.cursor()
     try:
@@ -80,12 +82,32 @@ def execute_values(conn, datafrm, table):
         show_psycopg2_exception(err)
         cursor.close()
 
+#SELECT data into the table
+def select(table, where=None, order=None):
+    connection = connect()
+    cursor = connection.cursor()
+    # Execute SQL query
+    if not where and not order:
+        cursor.execute(f'SELECT * FROM {table}')
+    elif where and not order:
+        cursor.execute(f'SELECT * FROM {table} WHERE {where}')
+    elif not where and order:
+        cursor.execute(f'SELECT * FROM {table} ORDER BY {order}')
+    else:
+        cursor.execute(f'SELECT * FROM {table} WHERE {where} ORDER BY {order}')    
+    # Gets all rows from the result
+    rows = cursor.fetchall()
+    return rows
+
+#INSERT data into the table
+def insert(table, column, att):
+    #import pdb; pdb.set_trace()
+    insert = f'INSERT INTO {table} ({column}) VALUES {att}'
+    connection = connect()  # Getting from function connect to the connection of database
+    cursor = connection.cursor()
+    cursor.execute(insert) #Execute SQL query 
+    connection.commit() #Makes a commit to the database.
+    id = cursor.lastrowid
+    return id
 
 
-# Connect to the database
-conn = connect(conn_params)
-conn.autocommit = True
-# Run the execute_many method
-# execute_many(conn, producttable, 'test')
-temp = temp[~temp.Key.isin(temp_df.Key)]
-execute_values(conn, temp_df, 'cafe')

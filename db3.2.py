@@ -16,9 +16,9 @@ from sqlalchemy import exc
 # missing port from coonn_params see other files for example
 conn_params = {
     "host"      : "localhost",
-    "database"  : "test2",
-    "user"      : "team4gp",
-    "password"  : "team4pw"
+    "database"  : "cafe_intel",
+    "user"      : "root",
+    "password"  : "password"
 }
 #Define a function that handles and parses psycopg2 exceptions
 def show_psycopg2_exception(err):

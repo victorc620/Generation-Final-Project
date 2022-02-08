@@ -71,25 +71,34 @@ def create_location_df(df_transformed):
     location_df = pd.DataFrame(loction_array, columns= ["location"])
     return location_df
 
-#------------------------------------------------------------------------
-# Load csv into python as pandas DataFrame
-df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
+def load_data():
+    #------------------------------------------------------------------------
+    # Load csv into python as pandas DataFrame
+    df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
 
-# Perform data_normalization
-df_transformed = copy_of_original_data(df_original)
-df_transformed = create_hash_id(df_transformed)
-df_transformed = products_price_explode(df_transformed, "productsprice", ",")
-df_transformed = add_product_price_colume(df_transformed)
-df_transformed = drop_column(df_transformed, "card_number")
-df_transformed = drop_column(df_transformed, "fullname")
-df_transformed = set_index(df_transformed, "order_id")
-df_transformed = clean_spaces(df_transformed)
-print(df_transformed)
+    # Perform data_normalization
+    df_transformed = copy_of_original_data(df_original)
+    df_transformed = create_hash_id(df_transformed)
+    df_transformed = products_price_explode(df_transformed, "productsprice", ",")
+    df_transformed = add_product_price_colume(df_transformed)
+    df_transformed = drop_column(df_transformed, "card_number")
+    df_transformed = drop_column(df_transformed, "fullname")
+    df_transformed = set_index(df_transformed, "order_id")
+    df_transformed = clean_spaces(df_transformed)
+    return df_transformed
+    #print(df_transformed)
 
+def products():
+    df_transformed = load_data()
+    product_df = create_product_df(df_transformed)
+    return product_df.to_dict('series')
+    
+def location():
+    df_transformed = load_data()
+    location_df = create_location_df(df_transformed)
+    return location_df.to_dict()
 
-product_df = create_product_df(df_transformed)
-location_df = create_location_df(df_transformed)
-
+'''
 # Upload location_df to SQL
 engine = create_engine("postgresql://team4gp:team4pw@localhost:5432")
 try:
@@ -109,3 +118,4 @@ print(location_dict)
 orders_df = copy_of_original_data(df_transformed)
 orders_df["location"].replace(location_dict, inplace=True)
 print(orders_df)
+'''
