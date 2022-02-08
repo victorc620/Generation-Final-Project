@@ -20,18 +20,19 @@ def insert_order():
             insert("orders", cln, att)
         id+=1
 
-#FUNCTION FOR INSRT ON TABLE ORDERS PRODUCTS
+#FUNCTION FOR INSRT ON TABLE ORDERS_PRODUCTS
 def insert_order_prd():
-    ord = load_data()
-    dic_ord = ord.to_dict('series')
-    order_ids = dic_ord['datetime']
+    #import pdb; pdb.set_trace()
+    dic_ord = orders_products()
+    order_ids = dic_ord['order_id']
     id = 0
-    for ids, dt_time in order_ids.items():
-        ord_id = get_order_id(ids)
-        prd_name = dic_ord['products'][id]
+    for ids, order_id in order_ids.items():
+        #import pdb; pdb.set_trace()
+        prd_name = dic_ord['products'][ids]
         prd_id = get_product_id(prd_name)
-        cln = "order_id, product_id"
-        att = str(ids), prd_id[0][0]
+        prd_qtt = dic_ord['quantity_purchased'][ids]
+        cln = "order_id, product_id, quantity_purchased"
+        att = order_id, prd_id[0][0], prd_qtt
         insert("orders_products", cln, att)
         id+=1            
             

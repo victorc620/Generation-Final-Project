@@ -132,7 +132,7 @@ def orders():
 def orders_products():
     df_transformed = load_data()
     orders_products_df = create_orders_products_df(df_transformed)
-    return orders_products_df
+    return orders_products_df.to_dict('series')
 
 '''
 # Upload location_df to SQL
