@@ -29,9 +29,9 @@ def connect():
 
     conn_params = {
         "host"      : "localhost",
-        "database"  : "cafe_intel",
-        "user"      : "root",
-        "password"  : "password"
+        "database"  : "team4gp",
+        "user"      : "team4gp",
+        "password"  : "team4pw"
     }
     
     """Connecting to Postgresql database server"""
