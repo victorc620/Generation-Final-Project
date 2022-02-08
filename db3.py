@@ -102,6 +102,7 @@ def select(table, where=None, order=None):
     
 #INSERT data into the table
 def insert(table, column, att):
+    #import pdb; pdb.set_trace()
     insert = f'INSERT INTO {table} ({column}) VALUES {att}'
     connection = connect()  # Getting from function connect to the connection of database
     cursor = connection.cursor()
