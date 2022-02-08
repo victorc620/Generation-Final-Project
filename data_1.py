@@ -91,6 +91,12 @@ def create_orders_df(df_transformed):
     orders_df = orders_df.drop_duplicates()
     return orders_df
 
+def create_orders_products_df(df_transformed):
+    orders_products_df = df_transformed[["products"]]
+    orders_products_df = orders_products_df.groupby(["order_id","products"]).size()
+    orders_products_df = orders_products_df.reset_index(name="quantity_purchased")
+    return orders_products_df
+
 def load_data():
     #------------------------------------------------------------------------
     # Load csv into python as pandas DataFrame
@@ -98,7 +104,7 @@ def load_data():
 
     # Perform data_normalization
     df_transformed = copy_of_original_data(df_original)
-    df_transformed = create_hash_id(df_transformed)
+    df_transformed = create_hash_id(df_transformed, "order_id")
     df_transformed = products_price_explode(df_transformed, "productsprice", ",")
     df_transformed = add_product_price_colume(df_transformed)
     df_transformed = drop_column(df_transformed, "card_number")
@@ -122,6 +128,12 @@ def orders():
     df_transformed = load_data()
     orders_df = create_orders_df(df_transformed)
     return orders_df
+
+
+def orders_products():
+    df_transformed = load_data()
+    orders_products_df = create_orders_products_df(df_transformed)
+    return orders_products_df
 
 '''
 # Upload location_df to SQL
