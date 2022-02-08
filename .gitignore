@@ -142,3 +142,4 @@ csv
 final-project.pdf
 .data
 .env
+data_normalization.py
