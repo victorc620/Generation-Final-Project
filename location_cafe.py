@@ -6,15 +6,14 @@ from data_1 import *
 def insert_cafe():
     loc = location()
     dic = loc['location']
-    for d in dic.values():
+    for i, d in dic.items():
         cafe_id = get_cafe_id(d)
         if not cafe_id:
-            id = insert("cafe", "location", f"('{d}')")
+            att = f"('{i}', '{d}')"
+            id = insert("cafe", "cafe_id, location", att)
 
-            
 #GET CAFE_ID
 def get_cafe_id(local):
-    #import pdb; pdb.set_trace()
     w = f"location='{local}'"
     cafe_id = select("cafe", where = w)
     return cafe_id

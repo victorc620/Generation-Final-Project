@@ -127,7 +127,7 @@ def location():
 def orders():
     df_transformed = load_data()
     orders_df = create_orders_df(df_transformed)
-    return orders_df
+    return orders_df.to_dict('series')
 
 def orders_products():
     df_transformed = load_data()

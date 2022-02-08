@@ -5,14 +5,12 @@ from products import *
 
 #FUNCTION FOR INSRT ON TABLE ORDER
 def insert_order():
-    ord = load_data()
-    dic_ord = ord.to_dict('series')
+    dic_ord = orders()
     order_ids = dic_ord['datetime']
     id = 0
     for ids, dt_time in order_ids.items():
         ord_id = get_order_id(ids)
         if not ord_id:
-            #import pdb; pdb.set_trace()
             cafe_name = dic_ord['location'][id]
             cafe_id = get_cafe_id(cafe_name)
             payment = dic_ord['payment_type'][id]
