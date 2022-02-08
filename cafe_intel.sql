@@ -12,7 +12,7 @@ CREATE TABLE "public"."orders" (
     "cafe_id" character varying(45) NOT NULL,
     "date" timestamp NOT NULL,
     "payment_type" character varying(45) NOT NULL,
-    "total_price" real NOT NULL,
+    "total_price" double precision NOT NULL,
     CONSTRAINT "orders_pkey" PRIMARY KEY ("order_id")
 ) WITH (oids = false);
 
