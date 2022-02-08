@@ -3,7 +3,7 @@ from data_1 import *
 from location_cafe import *
 from products import *
 
-#CREAT FUNCTION FOR INSRT ON TABLE ORDER
+#FUNCTION FOR INSRT ON TABLE ORDER
 def insert_order():
     ord = load_data()
     dic_ord = ord.to_dict('series')
@@ -22,6 +22,7 @@ def insert_order():
             insert("orders", cln, att)
         id+=1
 
+#FUNCTION FOR INSRT ON TABLE ORDERS PRODUCTS
 def insert_order_prd():
     ord = load_data()
     #import pdb; pdb.set_trace()
@@ -38,7 +39,7 @@ def insert_order_prd():
         insert("orders_products", cln, att)
         id+=1            
             
-#GET CAFE_ID
+#GET ORDER_ID
 def get_order_id(order_id):
     #import pdb; pdb.set_trace()
     w = f"order_id='{order_id}'"

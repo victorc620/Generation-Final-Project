@@ -66,7 +66,6 @@ def connect():
         
 # Define function using psycopg2.extras.execute_values() to insert the dataframe.
 def execute_values(conn, datafrm, table):
-    import pdb; pdb.set_trace()
     # Creating a list of tupples from the dataframe values
     tpls = [tuple(x) for x in datafrm.to_numpy()]
     # dataframe columns with Comma-separated
@@ -97,8 +96,10 @@ def select(table, where=None, order=None):
         cursor.execute(f'SELECT * FROM {table} WHERE {where} ORDER BY {order}')    
     # Gets all rows from the result
     rows = cursor.fetchall()
+    cursor.close()
     return rows
-
+    
+    
 #INSERT data into the table
 def insert(table, column, att):
     #import pdb; pdb.set_trace()
@@ -108,6 +109,7 @@ def insert(table, column, att):
     cursor.execute(insert) #Execute SQL query 
     connection.commit() #Makes a commit to the database.
     id = cursor.lastrowid
+    cursor.close()
     return id
 
 
