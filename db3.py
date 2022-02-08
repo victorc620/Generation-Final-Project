@@ -9,8 +9,6 @@ import pandas as pd
 
 from data_1 import *
 
-
-
 def show_psycopg2_exception(err):
     # get details about the exception
     err_type, traceback = sys.exc_info()
@@ -29,9 +27,9 @@ def connect():
 
     conn_params = {
         "host"      : "localhost",
-        "database"  : "cafe_intel",
-        "user"      : "root",
-        "password"  : "password"
+        "database"  : "team4gp",
+        "user"      : "team4gp",
+        "password"  : "team4pw"
     }
     
     """Connecting to Postgresql database server"""
@@ -99,7 +97,6 @@ def select(table, where=None, order=None):
     cursor.close()
     return rows
     
-    
 #INSERT data into the table
 def insert(table, column, att):
     #import pdb; pdb.set_trace()
@@ -111,5 +108,3 @@ def insert(table, column, att):
     id = cursor.lastrowid
     cursor.close()
     return id
-
-
