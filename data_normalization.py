@@ -85,6 +85,12 @@ def create_orders_df(df_transformed):
     orders_df = orders_df.drop_duplicates()
     return orders_df
 
+def create_orders_products_df(df_transformed):
+    orders_products_df = df_transformed[["products"]]
+    orders_products_df = orders_products_df.groupby(["order_id","products"]).size()
+    orders_products_df = orders_products_df.reset_index(name="quantity_purchased")
+    return orders_products_df
+
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
 df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
@@ -103,10 +109,12 @@ print(df_transformed)
 product_df = create_product_df(df_transformed)
 location_df = create_location_df(df_transformed)
 orders_df = create_orders_df(df_transformed)
+orders_products_df = create_orders_products_df(df_transformed)
 
 print(product_df)
 print(location_df)
 print(orders_df)
+print(orders_products_df)
 
 
 
