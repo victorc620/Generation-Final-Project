@@ -3,11 +3,10 @@ from data_1 import *
 from location_cafe import *
 from products import *
 
-#FUNCTION FOR INSRT ON TABLE ORDER
+#FUNCTION FOR INSERT ON TABLE ORDER
 def insert_order():
     dic_ord = orders()
     order_ids = dic_ord['datetime']
-    id = 0
     for ids, dt_time in order_ids.items():
         ord_id = get_order_id(ids)
         if not ord_id:
@@ -18,14 +17,12 @@ def insert_order():
             cln = "order_id, cafe_id, date, payment_type, total_price"
             att = str(ids), cafe_id[0][0], str(dt_time), str(payment), str(total_price)
             insert("orders", cln, att)
-        id+=1
 
 #FUNCTION FOR INSRT ON TABLE ORDERS_PRODUCTS
 def insert_order_prd():
     #import pdb; pdb.set_trace()
     dic_ord = orders_products()
     order_ids = dic_ord['order_id']
-    id = 0
     for ids, order_id in order_ids.items():
         #import pdb; pdb.set_trace()
         prd_name = dic_ord['products'][ids]
@@ -33,8 +30,7 @@ def insert_order_prd():
         prd_qtt = dic_ord['quantity_purchased'][ids]
         cln = "order_id, product_id, quantity_purchased"
         att = order_id, prd_id[0][0], prd_qtt
-        insert("orders_products", cln, att)
-        id+=1            
+        insert("orders_products", cln, att)           
             
 #GET ORDER_ID
 def get_order_id(order_id):

@@ -38,9 +38,7 @@ def connect():
     conn =None
     try:
         # connect to postgresql
-        print('connecting to Postgresql server')
         conn = psycopg2.connect(**conn_params)
-        print("Connection successfully..................")
     except OperationalError as err:
         show_psycopg2_exception(err)
         conn = None
