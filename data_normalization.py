@@ -111,9 +111,6 @@ location_df = create_location_df(df_transformed)
 orders_df = create_orders_df(df_transformed)
 orders_products_df = create_orders_products_df(df_transformed)
 
-
-
-
 print(product_df)
 print(location_df)
 print(orders_df)

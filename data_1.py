@@ -129,7 +129,6 @@ def orders():
     orders_df = create_orders_df(df_transformed)
     return orders_df
 
-
 def orders_products():
     df_transformed = load_data()
     orders_products_df = create_orders_products_df(df_transformed)
