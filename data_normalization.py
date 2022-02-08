@@ -5,6 +5,8 @@ from datetime import datetime
 import psycopg2
 from sqlalchemy import create_engine
 
+from data_1 import orders
+
 def create_hash_id(df_arg: pd.DataFrame, column):
     """
     Generate a hash id based on the original data (before removing any data)
@@ -77,6 +79,12 @@ def create_location_df(df_transformed):
     location_df.set_index("location_id",inplace=True)
     return location_df
 
+def create_orders_df(df_transformed):
+    # order_id, cafe_id, date, payment_type, total_price
+    orders_df = df_transformed[["location","datetime","payment_type","total_price"]]
+    orders_df = orders_df.drop_duplicates()
+    return orders_df
+
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
 df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
@@ -92,11 +100,15 @@ df_transformed = set_index(df_transformed, "order_id")
 df_transformed = clean_spaces(df_transformed)
 print(df_transformed)
 
-
 product_df = create_product_df(df_transformed)
-print(product_df)
 location_df = create_location_df(df_transformed)
+orders_df = create_orders_df(df_transformed)
+
+print(product_df)
 print(location_df)
+print(orders_df)
+
+
 
 # # Upload location_df to SQL
 # engine = create_engine("postgresql://team4gp:team4pw@localhost:5432")
@@ -138,8 +150,3 @@ print(location_df)
 # # location_dict = db_cafe_df.to_dict()["location"]
 # # location_dict = {y:x for x,y in location_dict.items()}
 
-# # Create Orders Table
-# orders_df = create_orders_df(df_transformed)
-# orders_df.reset_index(inplace=True)
-# # execute_values(orders_df, "orders")
-# print(orders_df)
