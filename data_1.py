@@ -5,12 +5,20 @@ from datetime import datetime
 import psycopg2
 from sqlalchemy import create_engine
 
-def create_hash_id(df_arg: pd.DataFrame):
+# def create_hash_id(df_arg: pd.DataFrame):
+#     """
+#     Generate a hash id based on the original data (before removing any data)
+#     hashing method still waiting to be updated
+#     """
+#     df_arg["order_id"]=df_arg.astype(str).sum(1).apply(lambda x:hashlib.md5(x.encode()).hexdigest())
+#     return df_arg
+
+def create_hash_id(df_arg: pd.DataFrame, column):
     """
     Generate a hash id based on the original data (before removing any data)
     hashing method still waiting to be updated
     """
-    df_arg["order_id"]=df_arg.astype(str).sum(1).apply(lambda x:hashlib.md5(x.encode()).hexdigest())
+    df_arg[column]=df_arg.astype(str).sum(1).apply(lambda x:hashlib.md5(x.encode()).hexdigest())
     return df_arg
 
 def drop_column(df_arg: pd.DataFrame, column:str):
@@ -63,13 +71,25 @@ def clean_spaces(df_args):
 
 def create_product_df(df_transformed):
     product_df = df_transformed[["products","product_price"]]
+    product_df.reset_index(inplace=True)
+    product_df = product_df.drop(columns = "order_id")
     product_df = product_df.drop_duplicates(subset=['products'])
+    product_df = create_hash_id(product_df , "product_id")
+    product_df.set_index("product_id", inplace=True)
     return product_df
 
 def create_location_df(df_transformed):
     loction_array = df_transformed["location"].unique()
     location_df = pd.DataFrame(loction_array, columns= ["location"])
+    location_df = create_hash_id(location_df, "location_id")
+    location_df.set_index("location_id",inplace=True)
     return location_df
+
+def create_orders_df(df_transformed):
+    # order_id, cafe_id, date, payment_type, total_price
+    orders_df = df_transformed[["location","datetime","payment_type","total_price"]]
+    orders_df = orders_df.drop_duplicates()
+    return orders_df
 
 def load_data():
     #------------------------------------------------------------------------
@@ -97,6 +117,11 @@ def location():
     df_transformed = load_data()
     location_df = create_location_df(df_transformed)
     return location_df.to_dict()
+
+def orders():
+    df_transformed = load_data()
+    orders_df = create_orders_df(df_transformed)
+    return orders_df
 
 '''
 # Upload location_df to SQL

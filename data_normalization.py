@@ -5,12 +5,14 @@ from datetime import datetime
 import psycopg2
 from sqlalchemy import create_engine
 
-def create_hash_id(df_arg: pd.DataFrame):
+from data_1 import orders
+
+def create_hash_id(df_arg: pd.DataFrame, column):
     """
     Generate a hash id based on the original data (before removing any data)
     hashing method still waiting to be updated
     """
-    df_arg["order_id"]=df_arg.astype(str).sum(1).apply(lambda x:hashlib.md5(x.encode()).hexdigest())
+    df_arg[column]=df_arg.astype(str).sum(1).apply(lambda x:hashlib.md5(x.encode()).hexdigest())
     return df_arg
 
 def drop_column(df_arg: pd.DataFrame, column:str):
@@ -63,13 +65,25 @@ def clean_spaces(df_args):
 
 def create_product_df(df_transformed):
     product_df = df_transformed[["products","product_price"]]
+    product_df.reset_index(inplace=True)
+    product_df = product_df.drop(columns = "order_id")
     product_df = product_df.drop_duplicates(subset=['products'])
+    product_df = create_hash_id(product_df , "product_id")
+    product_df.set_index("product_id", inplace=True)
     return product_df
 
 def create_location_df(df_transformed):
     loction_array = df_transformed["location"].unique()
     location_df = pd.DataFrame(loction_array, columns= ["location"])
+    location_df = create_hash_id(location_df, "location_id")
+    location_df.set_index("location_id",inplace=True)
     return location_df
+
+def create_orders_df(df_transformed):
+    # order_id, cafe_id, date, payment_type, total_price
+    orders_df = df_transformed[["location","datetime","payment_type","total_price"]]
+    orders_df = orders_df.drop_duplicates()
+    return orders_df
 
 #------------------------------------------------------------------------
 # Load csv into python as pandas DataFrame
@@ -77,7 +91,7 @@ df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
 
 # Perform data_normalization
 df_transformed = copy_of_original_data(df_original)
-df_transformed = create_hash_id(df_transformed)
+df_transformed = create_hash_id(df_transformed, "order_id")
 df_transformed = products_price_explode(df_transformed, "productsprice", ",")
 df_transformed = add_product_price_colume(df_transformed)
 df_transformed = drop_column(df_transformed, "card_number")
@@ -86,26 +100,53 @@ df_transformed = set_index(df_transformed, "order_id")
 df_transformed = clean_spaces(df_transformed)
 print(df_transformed)
 
-
 product_df = create_product_df(df_transformed)
 location_df = create_location_df(df_transformed)
+orders_df = create_orders_df(df_transformed)
 
-# Upload location_df to SQL
-engine = create_engine("postgresql://team4gp:team4pw@localhost:5432")
-try:
-    location_df.to_sql("cafe", engine, if_exists="append", index=False)
-except:
-    pass
-
-# Download location_df to SQL
-location_df_from_sql = pd.read_sql("cafe", engine,index_col="cafe_id")
-print(location_df_from_sql)
-
-location_dict = location_df_from_sql.to_dict()["location"]
-location_dict = {y:x for x,y in location_dict.items()}
-print(location_dict)
-
-
-orders_df = copy_of_original_data(df_transformed)
-orders_df["location"].replace(location_dict, inplace=True)
+print(product_df)
+print(location_df)
 print(orders_df)
+
+
+
+# # Upload location_df to SQL
+# engine = create_engine("postgresql://team4gp:team4pw@localhost:5432")
+# try:
+#     location_df.to_sql("cafe", engine, if_exists="append", index=False)
+# except:
+#     pass
+
+# # Download location_df to SQL
+# location_df_from_sql = pd.read_sql("cafe", engine,index_col="cafe_id")
+# print(location_df_from_sql)
+
+# location_dict = location_df_from_sql.to_dict()["location"]
+# location_dict = {y:x for x,y in location_dict.items()}
+# print(location_dict)
+
+
+# orders_df = copy_of_original_data(df_transformed)
+# orders_df["location"].replace(location_dict, inplace=True)
+# print(orders_df)
+
+# # Create Product Table
+# product_df = create_product_df(df_transformed)
+# product_df = create_hash_id(product_df, "product_id")
+# product_df = product_df.reset_index().drop(columns="order_id").set_index("product_id")
+# print(product_df)
+# # execute_values(product_df, "products")
+
+# # # Create Location Table 
+# location_df = create_location_df(df_transformed)
+# location_df = create_hash_id(location_df, "location_id")
+# location_df.set_index("location_id", inplace=True)
+# print(location_df)
+
+# # execute_values(location_df, "cafe")
+
+# # # # Upload location_df to SQL
+# # db_cafe_df = load_from_sql("cafe", "cafe_id")
+# # location_dict = db_cafe_df.to_dict()["location"]
+# # location_dict = {y:x for x,y in location_dict.items()}
+
