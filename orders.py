@@ -11,10 +11,10 @@ def insert_order():
     for ids, dt_time in order_ids.items():
         ord_id = get_order_id(ids)
         if not ord_id:
-            cafe_name = dic_ord['location'][id]
+            cafe_name = dic_ord['location'][ids]
             cafe_id = get_cafe_id(cafe_name)
-            payment = dic_ord['payment_type'][id]
-            total_price = dic_ord['total_price'][id]
+            payment = dic_ord['payment_type'][ids]
+            total_price = dic_ord['total_price'][ids]
             cln = "order_id, cafe_id, date, payment_type, total_price"
             att = str(ids), cafe_id[0][0], str(dt_time), str(payment), str(total_price)
             insert("orders", cln, att)
@@ -23,13 +23,11 @@ def insert_order():
 #FUNCTION FOR INSRT ON TABLE ORDERS PRODUCTS
 def insert_order_prd():
     ord = load_data()
-    #import pdb; pdb.set_trace()
     dic_ord = ord.to_dict('series')
     order_ids = dic_ord['datetime']
     id = 0
     for ids, dt_time in order_ids.items():
         ord_id = get_order_id(ids)
-        #import pdb; pdb.set_trace()
         prd_name = dic_ord['products'][id]
         prd_id = get_product_id(prd_name)
         cln = "order_id, product_id"

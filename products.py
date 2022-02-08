@@ -2,20 +2,17 @@ from db3 import *
 from data_1 import *
 
 
-#FUNCTION FOR INSRT LOCATION ON TABLE 
+#FUNCTION FOR INSeRT LOCATION ON TABLE 
 def insert_product():
     prd = products()
     dic_prd = prd['products']
-    id = 0
-    for p in dic_prd:
-        price = prd["product_price"][id]
+    for i, p in dic_prd.items():
+        price = prd["product_price"][i]
         product_id = get_product_id(p)
         if not product_id:
-            att = f"('{p}', {price})"
-            insert("products", "products, products_price", att)
-        id+=1
+            att = f"('{i}','{p}', {price})"
+            insert("products", "product_id, products, products_price", att)
 
-            
 #GET PRODUCTS_ID
 def get_product_id(product):
     w = f"products='{product}'"
