@@ -33,8 +33,6 @@ CREATE TABLE "public"."products" (
     CONSTRAINT "products_pkey" PRIMARY KEY ("product_id")
 ) WITH (oids = false);
 
-
-ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "orders_order_id_fkey" FOREIGN KEY (order_id) REFERENCES orders(order_id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "cafe_id_fkey" FOREIGN KEY (cafe_id) REFERENCES cafe(cafe_id) NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."orders_products" ADD CONSTRAINT "orders_products_id_order_fkey" FOREIGN KEY (order_id) REFERENCES orders(order_id) NOT DEFERRABLE;
