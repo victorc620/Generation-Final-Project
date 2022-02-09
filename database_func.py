@@ -59,6 +59,7 @@ def insert_into_orders(orders_df: pd.DataFrame, engine):
     orders_df.to_sql(name = "orders_temp", con=engine, index=True,
                     if_exists='replace', dtype={"date": sqlalchemy.DateTime()})
 
+    execute_sql_db("DROP TABLE IF EXISTS orders_temp_2")
     sql = """CREATE TABLE orders_temp_2 AS (
             SELECT order_id, cafe.cafe_id, datetime, payment_type, total_price
             FROM orders_temp
@@ -85,6 +86,7 @@ def insert_into_orders_products(orders_products_df, engine):
     orders_products_df.to_sql(name = "op_temp", con=engine, index=False,
                     if_exists='replace', dtype={"quantity_purchased": sqlalchemy.types.Float})
 
+    execute_sql_db("DROP TABLE IF EXISTS op_temp_2")
     sql = """CREATE TABLE op_temp_2 AS (
             SELECT order_id, products.product_id, quantity_purchased
             FROM op_temp
