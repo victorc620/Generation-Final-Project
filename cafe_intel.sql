@@ -1,5 +1,3 @@
--- Adminer 4.8.1 PostgreSQL 13.1 (Debian 13.1-1.pgdg100+1) dump
-
 DROP TABLE IF EXISTS "cafe";
 CREATE TABLE "public"."cafe" (
     "cafe_id" character varying(45) NOT NULL,
@@ -14,7 +12,7 @@ CREATE TABLE "public"."orders" (
     "cafe_id" character varying(45) NOT NULL,
     "date" timestamp NOT NULL,
     "payment_type" character varying(45) NOT NULL,
-    "total_price" real NOT NULL,
+    "total_price" double precision NOT NULL,
     CONSTRAINT "orders_pkey" PRIMARY KEY ("order_id")
 ) WITH (oids = false);
 
@@ -35,10 +33,7 @@ CREATE TABLE "public"."products" (
     CONSTRAINT "products_pkey" PRIMARY KEY ("product_id")
 ) WITH (oids = false);
 
-
-ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "orders_order_id_fkey" FOREIGN KEY (order_id) REFERENCES orders(order_id) NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."orders" ADD CONSTRAINT "cafe_id_fkey" FOREIGN KEY (cafe_id) REFERENCES cafe(cafe_id) NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."orders_products" ADD CONSTRAINT "orders_products_id_order_fkey" FOREIGN KEY (order_id) REFERENCES orders(order_id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."orders_products" ADD CONSTRAINT "orders_products_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(product_id) NOT DEFERRABLE;
-
--- 2022-02-08 15:28:03.31124+00
