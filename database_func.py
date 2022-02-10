@@ -100,3 +100,45 @@ def insert_into_orders_products(orders_products_df, engine):
     execute_sql_db(sql)
     
     execute_sql_db("DROP TABLE op_temp_2")
+    
+# def insert_value(df, table_name):
+#     """execture PostgreSQL command in database"""
+#     connection = connect()
+#     connection.autocommit = True
+#     cursor = connection.cursor()
+#     # cursor.execute("SET SEARCH_PATH = 'public'")
+#     np_data = df.to_numpy()
+#     args_str = ','.join(cursor.mogrify(f'({",".join(["%s"] * len(np_data[0]))})', x) for x in tuple(map(tuple,np_data)))
+#     print(arg_str)
+#     cols = [f'"{x}"' for x in df.columns]
+#     insert_tmp = f"insert into {table_name} ({', '.join(cols)}) values {args_str.decode('utf-8')}"
+#     cursor.execute(insert_tmp)
+#     cursor.close()
+#     connection.close()
+
+# def insert_value(df, table_name, temp_table="no_temp_table"):
+#     """
+#     execture PostgreSQL command to insert data to redshift database
+    
+#     """
+#     connection = connect()
+#     connection.autocommit = True
+#     cursor = connection.cursor()
+    
+#     # Create temp_table
+#     if temp_table != "no_temp_table":
+#         sql = """CREATE TABLE cafe_temp(
+#             cafe_id VARCHAR(256),
+#             location VARCHAR(256)
+#             )
+#         """
+#         cursor.execute(sql)
+#         print("Created temp table")
+        
+#     np_data = df.to_numpy()
+#     args_str = b','.join(cursor.mogrify(f'({",".join(["%s"] * len(np_data[0]))})', x) for x in tuple(map(tuple,np_data)))
+#     cols = [x for x in df.columns]
+#     insert_tmp = f"insert into {temp_table} ({', '.join(cols)}) values {args_str.decode('utf-8')}"
+#     cursor.execute(insert_tmp)
+#     cursor.close()
+#     connection.close()

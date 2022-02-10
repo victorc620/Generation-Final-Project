@@ -19,4 +19,3 @@ def handler(event, context):
     filename = os.path.basename(key)
     s3.meta.client.download_file(bucket, key, f"/tmp/{filename}")
     # File downloaded to /tmp directory
-    

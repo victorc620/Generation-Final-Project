@@ -6,18 +6,21 @@ from data_normalisation_func import *
 # 1. Create different dataframe
 df_original = load_csv_to_df('src/chesterfield_25-08-2021_09-00-00.csv')
 df_transformed = basic_transform(df_original)
+print(df_transformed)
 
-product_df = create_product_df(df_transformed)
-location_df = create_location_df(df_transformed)
-orders_df = create_orders_df(df_transformed)
+# product_df = create_product_df(df_transformed)
+# location_df = create_location_df(df_transformed)
+# orders_df = create_orders_df(df_transformed)
 orders_products_df = create_orders_products_df(df_transformed)
+
+# print(orders_df)
 
 # 2. Insert dataframe into database
 # create engine location: postgresql://username:password@host:port/database
 # TODO Hide Credentials 
-engine = create_engine('postgresql://team4gp:team4pw@localhost:5432/team4gp')
+# engine = create_engine('postgresql://team4gp:team4pw@localhost:5432/team4gp')
 
-insert_into_cafe(location_df, engine)
-insert_into_products(product_df, engine)
-insert_into_orders(orders_df, engine)
-insert_into_orders_products(orders_products_df, engine)
+# insert_into_cafe(location_df, engine)
+# insert_into_products(product_df, engine)
+# insert_into_orders(orders_df, engine)
+# insert_into_orders_products(orders_products_df, engine)

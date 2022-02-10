@@ -102,6 +102,9 @@ def create_orders_df(df_transformed: pd.DataFrame):
     """Generate a orders_df that ready to be uploaded to orders table in database"""
     orders_df = df_transformed[["location","datetime","payment_type","total_price"]]
     orders_df = orders_df.drop_duplicates()
+    orders_df.reset_index(inplace=True)
+    orders_df.rename(columns = {"datetime":"date"}, inplace=True)
+    print(orders_df)
     return orders_df
 
 def create_orders_products_df(df_transformed: pd.DataFrame):
@@ -109,4 +112,5 @@ def create_orders_products_df(df_transformed: pd.DataFrame):
     orders_products_df = df_transformed[["products"]]
     orders_products_df = orders_products_df.groupby(["order_id","products"]).size()
     orders_products_df = orders_products_df.reset_index(name="quantity_purchased")
+    print(orders_products_df)
     return orders_products_df
