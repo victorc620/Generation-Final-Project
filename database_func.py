@@ -1,31 +1,10 @@
-import os
 import psycopg2
 import sqlalchemy
 import pandas as pd
-from dotenv import load_dotenv
-import redshift_connector
-import sqlalchemy as sa
-from sqlalchemy.engine.url import URL
-from sqlalchemy import orm as sa_orm
-
-def connect():
-    load_dotenv()
-    host = os.environ.get("host")
-    user = os.environ.get("user")
-    password = os.environ.get("password")
-    db = os.environ.get("database")
-    
-    conn = redshift_connector.connect(
-    host=host,
-    database=db,
-    user=user,
-    password=password
-    )
-    return conn
 
 def fetch_sql_db(sql: str, val=None):
     """Load data from database to python"""
-    connection = connect()
+    connection = psycopg2.connect(host= "localhost", user= "team4gp", password = "team4pw", database = "team4gp", port = "5432")
     cursor = connection.cursor()
     cursor.execute(sql, val)
     rows = cursor.fetchall()
@@ -35,7 +14,7 @@ def fetch_sql_db(sql: str, val=None):
     
 def execute_sql_db(sql: str, val=None):
     """execture PostgreSQL command in database"""
-    connection = connect()
+    connection = psycopg2.connect(host= "localhost", user= "team4gp", password = "team4pw", database = "team4gp", port = "5432")
     cursor = connection.cursor()
     cursor.execute(sql, val)
     connection.commit()
@@ -49,13 +28,6 @@ def insert_into_cafe(location_df: pd.DataFrame, engine):
     2. Insert data (that is not in cafe table) from temp table
     3. Drop temp table
     """
-    Session = sa_orm.sessionmaker()
-    Session.configure(bind=engine)
-    session = Session()
-
-    # Define Session-based Metadata
-    metadata = sa.MetaData(bind=session.bind)
-
     location_df.to_sql(name = "cafe_temp", con=engine, index=True, if_exists='replace')
 
     sql = "INSERT INTO cafe SELECT * FROM cafe_temp WHERE cafe_id NOT IN (SELECT cafe_id FROM cafe)"
@@ -69,14 +41,6 @@ def insert_into_products(product_df: pd.DataFrame, engine):
     2. Insert data (that is not in products table) from temp table
     3. Drop temp table
     """
-    
-    Session = sa_orm.sessionmaker()
-    Session.configure(bind=engine)
-    session = Session()
-
-    # Define Session-based Metadata
-    metadata = sa.MetaData(bind=session.bind)    
-    
     product_df.to_sql(name = "products_temp", con=engine, index=True,
                     if_exists='replace', dtype={"product_price": sqlalchemy.types.Float})
 
@@ -92,18 +56,9 @@ def insert_into_orders(orders_df: pd.DataFrame, engine):
     3. Insert data (that is not in orders table) from orders_temp_2
     4. Drop orders_temp and orders_temp_2 table
     """
-    
-    Session = sa_orm.sessionmaker()
-    Session.configure(bind=engine)
-    session = Session()
-
-    # Define Session-based Metadata
-    metadata = sa.MetaData(bind=session.bind)
-    
     orders_df.to_sql(name = "orders_temp", con=engine, index=True,
                     if_exists='replace', dtype={"date": sqlalchemy.DateTime()})
 
-    execute_sql_db("DROP TABLE IF EXISTS orders_temp_2")
     sql = """CREATE TABLE orders_temp_2 AS (
             SELECT order_id, cafe.cafe_id, datetime, payment_type, total_price
             FROM orders_temp
@@ -130,7 +85,6 @@ def insert_into_orders_products(orders_products_df, engine):
     orders_products_df.to_sql(name = "op_temp", con=engine, index=False,
                     if_exists='replace', dtype={"quantity_purchased": sqlalchemy.types.Float})
 
-    execute_sql_db("DROP TABLE IF EXISTS op_temp_2")
     sql = """CREATE TABLE op_temp_2 AS (
             SELECT order_id, products.product_id, quantity_purchased
             FROM op_temp
