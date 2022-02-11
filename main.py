@@ -14,7 +14,6 @@ orders_products_df = create_orders_products_df(df_transformed)
 
 # 2. Insert dataframe into database
 # create engine location: postgresql://username:password@host:port/database
-# TODO Hide Credentials 
 engine = create_engine('postgresql://team4gp:team4pw@localhost:5432/team4gp')
 
 insert_into_cafe(location_df, engine)
