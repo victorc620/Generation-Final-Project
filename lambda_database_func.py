@@ -1,36 +1,30 @@
-import os
+import os, boto3
 import psycopg2
 import pandas as pd
 
-
-# def connect():
-#     load_dotenv()
-#     host = os.environ.get("host")
-#     user = os.environ.get("user")
-#     password = os.environ.get("password")
-#     db = os.environ.get("database")
-    
-#     conn = redshift_connector.connect(
-#     host=host,
-#     database=db,
-#     user=user,
-#     password=password
-#     )
-#     return conn
-
 def connect():
-    host="redshiftcluster-bie5pcqdgojl.cje2eu9tzolt.eu-west-1.redshift.amazonaws.com"
-    port="5439"
-    password="9Aa19754-8433-11ec-9900-b29c4ad2293b"
-    user="team4"
-    database="team4_cafe"
+    
+    aws_client = boto3.client('ssm')
+    response = aws_client.get_parameter(
+    Name='team4_creds',
+    WithDecryption=True)
+
+    cred_string = response['Parameter']['Value']
+    cred_string = cred_string.strip("}{").split(",")
+    cred_string = [x.strip("\n") for x in cred_string]
+    print(cred_string)
+
+    redshift_host = cred_string[0].replace('"',"").replace(" ","").split(":")[1]
+    redshift_port = cred_string[1].replace('"',"").replace(" ","").split(":")[1]
+    redshift_password = cred_string[2].replace('"',"").replace(" ","").split(":")[1]
+    redshift_user = cred_string[3].replace('"',"").replace(" ","").split(":")[1]
     
     conn = psycopg2.connect(
-    host=host,
-    port=port,
-    database=database,
-    user=user,
-    password=password
+    host=redshift_host,
+    port=redshift_port,
+    database="team4_cafe",
+    user=redshift_user,
+    password=redshift_password
     )
     return conn
 
