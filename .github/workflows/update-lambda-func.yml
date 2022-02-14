@@ -1,0 +1,27 @@
+name: update-lambda-function
+
+on:
+  push:
+
+jobs:
+  build-lambda-layer:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    steps:
+      - name: checkout-repo
+        id: checkout-repo
+        uses: actions/checkout@v2
+
+
+      - name: create-lambda-layer
+        run: |
+          docker run -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"
+          zip -r team4-cicd.zip python > /dev/null
+          aws lambda publish-layer-version --layer-name team4-cicd-test --description "For CI/CD Test" --zip-file fileb://team4-cicd.zip --compatible-runtimes python3.8
+
+
+
