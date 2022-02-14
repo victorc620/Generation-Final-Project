@@ -12,7 +12,6 @@ def connect():
     cred_string = response['Parameter']['Value']
     cred_string = cred_string.strip("}{").split(",")
     cred_string = [x.strip("\n") for x in cred_string]
-    print(cred_string)
 
     redshift_host = cred_string[0].replace('"',"").replace(" ","").split(":")[1]
     redshift_port = cred_string[1].replace('"',"").replace(" ","").split(":")[1]
@@ -28,7 +27,7 @@ def connect():
     )
     return conn
 
-def insert_value(df, table_name, table_temp):
+def insert_value(df, table_name, table_temp, ):
     """
     execture PostgreSQL command to insert data to redshift database
     # TODO: Find out how to pass sql f-string as argument 
@@ -117,3 +116,4 @@ def insert_value(df, table_name, table_temp):
     cursor.execute(sql)
     cursor.close()
     connection.close()
+    

@@ -87,7 +87,7 @@ def create_product_df(df_transformed: pd.DataFrame):
     product_df = product_df.drop(columns = "order_id")
     product_df = product_df.drop_duplicates(subset=['products'])
     product_df = create_hash_id(product_df , "product_id")
-    product_df.set_index("product_id", inplace=True)
+    # product_df.set_index("product_id", inplace=True)
     return product_df
 
 def create_location_df(df_transformed: pd.DataFrame):
@@ -95,13 +95,15 @@ def create_location_df(df_transformed: pd.DataFrame):
     loction_array = df_transformed["location"].unique()
     location_df = pd.DataFrame(loction_array, columns= ["location"])
     location_df = create_hash_id(location_df, "cafe_id")
-    location_df.set_index("cafe_id",inplace=True)
+    # location_df.set_index("cafe_id",inplace=True)
     return location_df
 
 def create_orders_df(df_transformed: pd.DataFrame):
     """Generate a orders_df that ready to be uploaded to orders table in database"""
     orders_df = df_transformed[["location","datetime","payment_type","total_price"]]
     orders_df = orders_df.drop_duplicates()
+    orders_df.reset_index(inplace=True)
+    orders_df.rename(columns = {"datetime":"date"}, inplace=True)
     return orders_df
 
 def create_orders_products_df(df_transformed: pd.DataFrame):
