@@ -75,7 +75,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: team4-data-bucket
+      BucketName: team4-data-bucket-backup
       # NotificationConfiguration:
       #   LambdaConfigurations:
       #     - Event: s3:ObjectCreated:*
