@@ -79,7 +79,7 @@ Resources:
       # NotificationConfiguration:
       #   LambdaConfigurations:
       #     - Event: s3:ObjectCreated:*
-      Function: !GetAtt LambdaFunction.Arn
+      #       Function: !GetAtt LambdaFunction.Arn
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
