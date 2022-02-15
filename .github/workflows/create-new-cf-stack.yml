@@ -19,7 +19,7 @@ jobs:
 
       - name: create new cloudformation stack
         run: |
-          aws s3 cp aws_templates/team4-cf-template_sprint_3_completed.yml s3://team4-bucket-cf-template/templates/team4-cf-template_sprint_3_completed.yml
+          aws s3 cp aws_template/team4-cf-template_sprint_3_completed.yml s3://team4-bucket-cf-template/templates/team4-cf-template_sprint_3_completed.yml
           aws cloudformation create-stack --stack-name team-4-stack-sprint-4 --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/templates/team4-cf-template_sprint_3_completed.yml --region eu-west-1 --capabilities CAPABILITY_IAM
 
 
