@@ -1,0 +1,29 @@
+name: create-new-cloudformation
+
+on:
+  push:
+
+jobs:
+  build-lambda-layer:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    steps:
+      - name: checkout-repo
+        id: checkout-repo
+        uses: actions/checkout@v2
+
+
+      - name: create new cloudformation stack
+        run: |
+          export AWS_PROFILE=victor-profile
+          aws s3 cp aws_templates/team4-cf-template_sprint_3_completed.yml s3://team4-bucket-cf-template/templates/team4-cf-template_sprint_3_completed.yml
+          aws cloudformation create-stack --stack-name team-4-stack-sprint-4 --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/templates/team4-cf-template_sprint_3_completed.yml --region eu-west-1 --capabilities CAPABILITY_IAM
+
+
+
+
+
