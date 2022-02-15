@@ -40,13 +40,13 @@ Resources:
             Action:
               - 's3:*'
             Resource:
-              - "arn:aws:s3:::team4-data-bucket/*"
-              - "arn:aws:s3:::team4-data-bucket"
+              - "arn:aws:s3:::team4-just-for-backup/*"
+              - "arn:aws:s3:::team4-just-for-backup"
 
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: team-4-lambda-function
+      FunctionName: team-4-just-for-backup
       Runtime: python3.8
       Handler: index.handler
       Role: !GetAtt LambdaFunctionRole.Arn
@@ -75,11 +75,11 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: team4-data-bucket-backup
-      # NotificationConfiguration:
-      #   LambdaConfigurations:
-      #     - Event: s3:ObjectCreated:*
-      #       Function: !GetAtt LambdaFunction.Arn
+      BucketName: team4-just-for-backup
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt LambdaFunction.Arn
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
