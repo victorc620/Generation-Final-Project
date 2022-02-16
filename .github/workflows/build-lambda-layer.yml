@@ -21,5 +21,5 @@ jobs:
         run: |
           docker run -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"
           zip -r team-4-lambda-layer.zip python > /dev/null
-          aws lambda publish-layer-version --layer-name team-4-layer --description "For CI/CD Test" --zip-file fileb://team-4-lambda-layer.zip --compatible-runtimes python3.8
+          aws lambda publish-layer-version --layer-name team-4-lambda-layer --description "For CI/CD Test" --zip-file fileb://team-4-lambda-layer.zip --compatible-runtimes python3.8
 
