@@ -1,6 +1,10 @@
 import os, boto3
 import psycopg2
 import pandas as pd
+import backoff
+
+def backoff_hdlr(details):
+    print ("Backoff triggered")
 
 def connect():
     
@@ -27,6 +31,7 @@ def connect():
     )
     return conn
 
+@backoff.on_exception(backoff.expo, Exception, on_backoff=backoff_hdlr)
 def insert_value(df, table_name, table_temp):
     """
     execture PostgreSQL command to insert data to redshift database
@@ -42,113 +47,139 @@ def insert_value(df, table_name, table_temp):
     insert_tmp = f"insert into {table_temp} ({', '.join(cols)}) values {args_str.decode('utf-8')}"
     
     if table_name == "cafe":
-        sql = f"""
-            begin;
+        try:
+            sql = """
             CREATE TEMP TABLE cafe_temp(
             cafe_id VARCHAR(256),
             location VARCHAR(256)
-            );
+            );"""
+            cursor.execute(sql)
             
-            LOCK cafe_temp;
-            {insert_tmp};
+            sql = "LOCK cafe_temp;"
+            cursor.execute(sql)
             
-            LOCK cafe;
-            INSERT INTO cafe SELECT t.* FROM cafe_temp t
-            LEFT JOIN cafe c ON t.cafe_id = c.cafe_id
-            WHERE c.cafe_id IS NULL;
+            sql = insert_tmp
+            cursor.execute(sql)
             
-            end;
-            """
-        print("cafe inserted")
+            sql = "LOCK cafe;"
+            cursor.execute(sql)
+            
+            sql = """INSERT INTO cafe SELECT t.* FROM cafe_temp t
+                    LEFT JOIN cafe c ON t.cafe_id = c.cafe_id
+                    WHERE c.cafe_id IS NULL;"""
+            cursor.execute(sql)
+            
+            print("Cafe Successfully Inserted~~!")
+            
+        except Exception as e:
+            print(f"Insert Failed, error: {e}")
         
     elif table_name == "products":
-        sql = f"""
-            begin;
-            CREATE TEMP TABLE products_temp(
-            product_id VARCHAR(256) NOT NULL,
-            products VARCHAR(256) NOT NULL,
-            product_price DOUBLE PRECISION NOT NULL
-            );
+        try:
+            sql = """
+                CREATE TEMP TABLE products_temp(
+                product_id VARCHAR(256) NOT NULL,
+                products VARCHAR(256) NOT NULL,
+                product_price DOUBLE PRECISION NOT NULL
+                );"""
+            cursor.execute(sql)
             
-            LOCK products_temp;
-            {insert_tmp};
+            sql = "LOCK products_temp;"
+            cursor.execute(sql)
             
-            LOCK products;
-            INSERT INTO products SELECT t.* FROM products_temp t
-            LEFT JOIN products p ON t.product_id = p.product_id
-            WHERE p.product_id IS NULL;
+            sql = insert_tmp
+            cursor.execute(sql)
             
-            end;
-            """
-        print("products inserted")
-    
+            sql = "LOCK products;"
+            cursor.execute(sql)
+            
+            sql = """INSERT INTO products SELECT t.* FROM products_temp t
+                LEFT JOIN products p ON t.product_id = p.product_id
+                WHERE p.product_id IS NULL;"""
+            cursor.execute(sql)
+                
+            print("Products Successfully Inserted~~!")
+            
+        except Exception as e:
+            print(f"Insert Failed, error: {e}")
+
     elif table_name == "orders":
-        sql = f"""
-            begin;
+        try:
+            sql = """
             CREATE TEMP TABLE orders_temp(
             order_id VARCHAR(256) NOT NULL,
             location VARCHAR(256) NOT NULL,
             date TIMESTAMP without time zone,
             payment_type VARCHAR(256) NOT NULL,
             total_price double precision NOT NULL
-            );
+            );"""
+            cursor.execute(sql)
+        
+            sql ="LOCK orders_temp;"
+            cursor.execute(sql)
+        
+            sql = insert_tmp
+            cursor.execute(sql)
             
-            LOCK orders_temp;
-            {insert_tmp};
-            
-            
+            sql = """
             CREATE TEMP TABLE orders_temp_2 AS (
             SELECT order_id, cafe.cafe_id, date, payment_type, total_price
             FROM orders_temp
             INNER JOIN cafe
             ON cafe.location = orders_temp.location
-            );
+            );"""
+            cursor.execute(sql)
             
-            LOCK orders_temp_2;
-            LOCK orders;
-            INSERT INTO orders SELECT t.* FROM orders_temp_2 t
+            sql="LOCK orders_temp_2, orders;"
+            cursor.execute(sql)
+        
+            sql = """INSERT INTO orders SELECT t.* FROM orders_temp_2 t
             LEFT JOIN orders o ON t.order_id = o.order_id
-            WHERE o.order_id IS NULL;
+            WHERE o.order_id IS NULL;"""
+            cursor.execute(sql)
             
-            end;
-            """
-        print("orders inserted")
+            print("Orders Successfully Inserted~~!")
+            
+        except Exception as e:
+            print(f"Insert Failed, error: {e}")
+        
         
     elif table_name == "orders_products":
-        sql =f"""
-            begin;
-            CREATE TEMP TABLE orders_products_temp (
-            order_id VARCHAR(256) NOT NULL,
-            products VARCHAR(256) NOT NULL,
-            quantity_purchased INT
-            );
+        try:
+            sql ="""
+                CREATE TEMP TABLE orders_products_temp (
+                order_id VARCHAR(256) NOT NULL,
+                products VARCHAR(256) NOT NULL,
+                quantity_purchased INT
+                );"""
+            cursor.execute(sql)
+                
+            sql = "LOCK orders_products_temp;"
+            cursor.execute(sql)
             
-            LOCK orders_products_temp;
-            {insert_tmp};
-            
-            CREATE TEMP TABLE orders_products_temp_2 AS (
-            SELECT order_id, products.product_id, quantity_purchased
-            FROM orders_products_temp
-            INNER JOIN products
-            ON products.products = orders_products_temp.products
-            );
-            
-            LOCK orders_products_temp_2;
-            LOCK orders_products;
+            sql = insert_tmp
+            cursor.execute(sql)
+                
+            sql = """CREATE TEMP TABLE orders_products_temp_2 AS (
+                    SELECT order_id, products.product_id, quantity_purchased
+                    FROM orders_products_temp
+                    INNER JOIN products
+                    ON products.products = orders_products_temp.products
+                    );"""
+            cursor.execute(sql)
+                
+            sql = "LOCK orders_products_temp_2, orders_products;"
+            cursor.execute(sql)
+        
+            sql = """INSERT INTO orders_products SELECT t.* FROM orders_products_temp_2 t
+                LEFT JOIN orders_products op ON t.order_id = op.order_id
+                WHERE op.order_id IS NULL;"""
+            cursor.execute(sql)
     
-            INSERT INTO orders_products SELECT t.* FROM orders_products_temp_2 t
-            LEFT JOIN orders_products op ON t.order_id = op.order_id
-            WHERE op.order_id IS NULL;
+            print("Orders_Products Successfully Inserted~~!")
             
-            end;
-            """
-        print ("orders_products inserted")
-    try:
-        sql = sql.split(";")
-        for query in sql:
-            cursor.execute(query)
-    except Exception as e:
-        print(f"Error occurs: {e}")
+        except Exception as e:
+            print(f"Insert Failed, error: {e}")
 
     cursor.close()
     connection.close()
