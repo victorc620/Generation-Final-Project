@@ -19,6 +19,9 @@ jobs:
 
       - name: create-lambda-layer
         run: |
+          docker run -v "$PWD":/var/task "public.ecr.aws/sam/build-python3.8" /bin/sh -c "pip install -r requirements.txt -t python/lib/python3.8/site-packages/; exit"
+          zip -r team-4-lambda-layer-cicd.zip python > /dev/null
+          aws lambda publish-layer-version --layer-name team-4-cicd-test --description "For CI/CD Test" --zip-file fileb://team4-cicd.zip --compatible-runtimes python3.8
 
 
 

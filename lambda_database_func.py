@@ -27,7 +27,7 @@ def connect():
     )
     return conn
 
-def insert_value(df, table_name, table_temp, ):
+def insert_value(df, table_name, table_temp):
     """
     execture PostgreSQL command to insert data to redshift database
     # TODO: Find out how to pass sql f-string as argument 
@@ -43,33 +43,48 @@ def insert_value(df, table_name, table_temp, ):
     
     if table_name == "cafe":
         sql = f"""
+            begin;
             CREATE TEMP TABLE cafe_temp(
             cafe_id VARCHAR(256),
             location VARCHAR(256)
             );
-        
+            
+            LOCK cafe_temp;
             {insert_tmp};
-        
-            INSERT INTO cafe SELECT * FROM cafe_temp WHERE cafe_id NOT IN (SELECT cafe_id FROM cafe);
+            
+            LOCK cafe;
+            INSERT INTO cafe SELECT t.* FROM cafe_temp t
+            LEFT JOIN cafe c ON t.cafe_id = c.cafe_id
+            WHERE c.cafe_id IS NULL;
+            
+            end;
             """
         print("cafe inserted")
         
     elif table_name == "products":
         sql = f"""
+            begin;
             CREATE TEMP TABLE products_temp(
             product_id VARCHAR(256) NOT NULL,
             products VARCHAR(256) NOT NULL,
             product_price DOUBLE PRECISION NOT NULL
             );
-        
+            
+            LOCK products_temp;
             {insert_tmp};
-        
-            INSERT INTO products SELECT * FROM products_temp WHERE product_id NOT IN (SELECT product_id FROM products);
+            
+            LOCK products;
+            INSERT INTO products SELECT t.* FROM products_temp t
+            LEFT JOIN products p ON t.product_id = p.product_id
+            WHERE p.product_id IS NULL;
+            
+            end;
             """
         print("products inserted")
     
     elif table_name == "orders":
         sql = f"""
+            begin;
             CREATE TEMP TABLE orders_temp(
             order_id VARCHAR(256) NOT NULL,
             location VARCHAR(256) NOT NULL,
@@ -78,7 +93,9 @@ def insert_value(df, table_name, table_temp, ):
             total_price double precision NOT NULL
             );
             
+            LOCK orders_temp;
             {insert_tmp};
+            
             
             CREATE TEMP TABLE orders_temp_2 AS (
             SELECT order_id, cafe.cafe_id, date, payment_type, total_price
@@ -87,19 +104,26 @@ def insert_value(df, table_name, table_temp, ):
             ON cafe.location = orders_temp.location
             );
             
-            INSERT INTO orders SELECT * FROM orders_temp_2 
-            WHERE order_id NOT IN (SELECT order_id FROM orders);
+            LOCK orders_temp_2;
+            LOCK orders;
+            INSERT INTO orders SELECT t.* FROM orders_temp_2 t
+            LEFT JOIN orders o ON t.order_id = o.order_id
+            WHERE o.order_id IS NULL;
+            
+            end;
             """
         print("orders inserted")
         
     elif table_name == "orders_products":
         sql =f"""
+            begin;
             CREATE TEMP TABLE orders_products_temp (
             order_id VARCHAR(256) NOT NULL,
             products VARCHAR(256) NOT NULL,
             quantity_purchased INT
             );
             
+            LOCK orders_products_temp;
             {insert_tmp};
             
             CREATE TEMP TABLE orders_products_temp_2 AS (
@@ -109,11 +133,23 @@ def insert_value(df, table_name, table_temp, ):
             ON products.products = orders_products_temp.products
             );
             
-            INSERT INTO orders_products SELECT * FROM orders_products_temp_2 WHERE order_id NOT IN (SELECT order_id FROM orders_products);
+            LOCK orders_products_temp_2;
+            LOCK orders_products;
+    
+            INSERT INTO orders_products SELECT t.* FROM orders_products_temp_2 t
+            LEFT JOIN orders_products op ON t.order_id = op.order_id
+            WHERE op.order_id IS NULL;
+            
+            end;
             """
         print ("orders_products inserted")
-    
-    cursor.execute(sql)
+    try:
+        sql = sql.split(";")
+        for query in sql:
+            cursor.execute(query)
+    except Exception as e:
+        print(f"Error occurs: {e}")
+
     cursor.close()
     connection.close()
     
