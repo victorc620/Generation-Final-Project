@@ -30,8 +30,8 @@ def handler(event, context):
 
     product_df = create_product_df(df_transformed)
     location_df = create_location_df(df_transformed)
-    orders_df = create_orders_df(df_transformed)
-    orders_products_df = create_orders_products_df(df_transformed)
+    orders_df = create_orders_df(df_transformed, location_df)
+    orders_products_df = create_orders_products_df(df_transformed, product_df)
   
     # 2. Insert df into Redshift 
     insert_value(product_df, "products", table_temp = "products_temp")
