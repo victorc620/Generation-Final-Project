@@ -1,5 +1,7 @@
 
+from multiprocessing import connection
 from operator import index
+from sqlite3 import Cursor
 from unicodedata import name
 from black import assert_equivalent
 import pandas as pd
@@ -7,8 +9,15 @@ from unittest.mock import Mock
 import pandas as pd 
 from pandas.testing import assert_frame_equal, assert_series_equal
 from pytest import PytestAssertRewriteWarning
+from pytest import *
+import pytest    
+from pytest_postgresql import factories
+from pytest_postgresql import *
 import hashlib
 from datetime import datetime
+import psycopg2
+import sqlalchemy
+from unittest.mock import patch
 
 def drop_column(df_arg, column):
     "Drop any column in the DataFrame"
@@ -238,13 +247,13 @@ def load_csv_to_df(path:str):
                 date_parser=custom_date_parser)
     return df
 
-def test_load_csv_to_df():
-    #assemble 
-    expected = pd.DataFrame({'datetime': [2021-01-01 01:01:00], 'location': ['test'], 'fullname': ['test'], 'productsprice': [0], 'total_price': [0], 'payment_type': ['test'], 'card_number': [0000]}, datetime='datetime')
-    #act
-    actual = load_csv_to_df('/media/abali/New Volume/Group project/test/test_data.csv')
-    #assert 
-    assert_frame_equal(expected, actual)
+# def test_load_csv_to_df(): #TODO WORK ON THIS LATER ON 
+#     #assemble 
+#     expected = pd.DataFrame({'datetime': [2021-01-01 01:01:00], 'location': ['test'], 'fullname': ['test'], 'productsprice': [0], 'total_price': [0], 'payment_type': ['test'], 'card_number': [0000]}, datetime='datetime')
+#     #act
+#     actual = load_csv_to_df('/media/abali/New Volume/Group project/test/test_data.csv')
+#     #assert 
+#     assert_frame_equal(expected, actual)
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -265,4 +274,42 @@ def test_create_hash_id():
     #assert
     assert_frame_equal(expected, actual)
 
+#--------------------------------------------------------------------------------------------------
+def fetch_sql_db(sql: str, val=None):
+    """Load data from database to python"""
+    connection = psycopg2.connect(host= "localhost", user= "team4gp", password = "team4pw", database = "team4gp", port = "5432")
+    cursor = connection.cursor()
+    cursor.execute(sql, val)
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return rows
 
+
+@patch('psycopg2.connect')
+def test_fetch_sql_db(connect_mock):
+    cursor = connect_mock.return_value.cursor.return_value
+    cursor.fetchall.return_value = [(), ()]
+    rows = fetch_sql_db('test')
+    assert rows == [(), ()]
+    cursor.execute.assert_called_with('test', None)
+
+#---------------------------------------------------------------------------------------------------------------------------------------
+
+def execute_sql_db(sql: str, val=None):
+    """execture PostgreSQL command in database"""
+    connection = psycopg2.connect(host= "localhost", user= "team4gp", password = "team4pw", database = "team4gp", port = "5432")
+    cursor = connection.cursor()
+    cursor.execute(sql, val)
+    connection.commit()
+    cursor.close()
+    connection.close()
+    
+    
+@patch('psycopg2.connect')
+def test_execute_sql_db(connect_mock):
+    cursor = connect_mock.return_value.cursor.return_value
+    cursor.fetchall.return_value = [(), ()]
+    rows = execute_sql_db('test', None)
+    assert rows == None
+    cursor.execute.assert_called_with('test', None)
