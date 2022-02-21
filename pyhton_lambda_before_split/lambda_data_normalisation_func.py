@@ -90,6 +90,7 @@ def create_product_df(df_transformed: pd.DataFrame):
     product_df = product_df.drop_duplicates(subset=['products'])
     product_df = create_hash_id(product_df , "product_id")
     product_df = product_df.reindex(columns=["product_id","products","product_price"])
+    product_df["product_price"] = product_df["product_price"].to_numeric()
     # product_df.set_index("product_id", inplace=True)
     return product_df
 

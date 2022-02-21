@@ -1,0 +1,44 @@
+import boto3
+import json
+import pandas as pd
+from lambda_database_func import *
+
+def handler(event, context):
+    
+    s3_client = boto3.client('s3')
+    s3 = boto3.resource('s3')
+    
+    sqs_msg = event['Records'][0]["body"]
+    sqs_msg = json.loads(sqs_msg)
+    
+    s3_bucket_name = sqs_msg["Records"][0]["s3"]["bucket"]["name"]
+    s3_file_key = sqs_msg["Records"][0]["s3"]["object"]["key"]
+    
+
+    filename = s3_file_key
+    filename_without_time = s3_file_key.split(".")[0]
+    file_type = filename.split(".")[-1]
+    
+    if file_type == "csv":
+        #insert into Red Shift
+        if filename_without_time == "product_df":
+            insert_value('products', filename)
+        
+        elif filename_without_time == "location_df":
+            insert_value("cafe", filename)
+        
+        elif filename_without_time == "orders_df":
+            insert_value("orders", filename)
+        
+        elif filename_without_time == "orders_products_df":
+            insert_value("orders_products", filename)
+    
+    else:
+        print(f"file type is {file_type} instead of csv, nothing loaded to redshift.")
+        print(f"s3_bucket_name: {s3_bucket_name}")
+        print(f"s3_file_key: {s3_file_key}")
+    
+    print("Done")
+
+    
+    

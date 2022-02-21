@@ -3,8 +3,8 @@ import psycopg2
 import pandas as pd
 import backoff
 
-# def backoff_hdlr(details):
-#     print ("Backoff triggered")
+def backoff_hdlr(details):
+    print ("Backoff triggered")
 
 def connect():
     
@@ -31,19 +31,22 @@ def connect():
     )
     return conn
 
-# @backoff.on_exception(backoff.expo, Exception, on_backoff=backoff_hdlr)
-def insert_value(table_name, filename):
+@backoff.on_exception(backoff.expo, Exception, on_backoff=backoff_hdlr)
+def insert_value(df, table_name, table_temp):
     """
     execture PostgreSQL command to insert data to redshift database
     """
-
+    connection = connect()
+    connection.autocommit = True
+    cursor = connection.cursor()
+    print("Database connected")
     try:
-        connection = connect()
-        connection.autocommit = True
-        cursor = connection.cursor()
-        print("Database connected")
-        print(filename)
 
+        np_data = df.to_numpy()
+        args_str = b','.join(cursor.mogrify(f'({",".join(["%s"] * len(np_data[0]))})', x) for x in tuple(map(tuple,np_data)))
+        cols = [x for x in df.columns]
+        insert_tmp = f"insert into {table_temp} ({', '.join(cols)}) values {args_str.decode('utf-8')}"
+            
         if table_name == "cafe":
             try:
                 sql = """
@@ -53,12 +56,7 @@ def insert_value(table_name, filename):
                 );"""
                 cursor.execute(sql)
                 
-                sql = f"""
-                COPY cafe_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
+                sql = insert_tmp
                 cursor.execute(sql)
                 
                 sql = "LOCK cafe;"
@@ -83,21 +81,16 @@ def insert_value(table_name, filename):
                     product_price DOUBLE PRECISION NOT NULL
                     );"""
                 cursor.execute(sql)
-                
-                sql = f"""
-                COPY products_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
+                    
+                sql = insert_tmp
                 cursor.execute(sql)
-
+                
                 sql = "LOCK products;"
                 cursor.execute(sql)
                 
                 sql = """INSERT INTO products SELECT t.* FROM products_temp t
-                        LEFT JOIN products p ON t.product_id = p.product_id
-                        WHERE p.product_id IS NULL;"""
+                    LEFT JOIN products p ON t.product_id = p.product_id
+                    WHERE p.product_id IS NULL;"""
                 cursor.execute(sql)
                     
                 print("Products Successfully Inserted~~!")
@@ -116,15 +109,9 @@ def insert_value(table_name, filename):
                 total_price double precision NOT NULL
                 );"""
                 cursor.execute(sql)
-
-                sql = f"""
-                COPY orders_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
+                
+                sql = insert_tmp
                 cursor.execute(sql)
-
             
                 sql = """INSERT INTO orders SELECT t.* FROM orders_temp t
                     LEFT JOIN orders o ON t.order_id = o.order_id
@@ -145,13 +132,8 @@ def insert_value(table_name, filename):
                     quantity_purchased INT
                     );"""
                 cursor.execute(sql)
-
-                sql = f"""
-                COPY orders_products_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
+                
+                sql = insert_tmp
                 cursor.execute(sql)
             
                 sql = """INSERT INTO orders_products SELECT t.* FROM orders_products_temp t
@@ -171,7 +153,3 @@ def insert_value(table_name, filename):
         cursor.close()
         connection.close()
         print("Database connection closed")
-
-        
-
-    
