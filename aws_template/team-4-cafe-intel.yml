@@ -49,8 +49,8 @@ Resources:
               - "SQS:SendMessage"
               - "SQS:RecieveMessage"
             Effect: "Allow"
-            Resource: 
-      Queues: !Ref SQSQueue
+            Resource: !Ref SQSQueue
+      Queues: 
         - !Ref SQSQueue
 
   LambdaFunctionRole:
