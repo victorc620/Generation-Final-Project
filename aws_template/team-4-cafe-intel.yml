@@ -23,8 +23,8 @@ Resources:
       BucketName: team-4-transformed-data-production
       NotificationConfiguration:
         QueueConfigurations:
-          - Event: s3:ObjectCreated:*
-            Function: arn:aws:sqs:eu-west-1:696036660875:team-4-sqs-queue-production
+          - Event: 's3:ObjectCreated:*'
+            Function: 'arn:aws:sqs:eu-west-1:696036660875:team-4-sqs-queue-production'
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission

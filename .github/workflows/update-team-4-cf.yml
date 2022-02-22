@@ -18,7 +18,7 @@ jobs:
 
       - name: create team-4-extract-transform-production.zip
         run: |
-          docker run -v "$PWD":/var/task "lambci/lambda:build-python3.8" /bin/sh -c "pip install -r requirements.txt -t package/; exit"
+          # docker run -v "$PWD":/var/task "lambci/lambda:build-python3.8" /bin/sh -c "pip install -r requirements.txt -t package/; exit"
           cd package
           zip -r ../team-4-extract-transform-production.zip . 
           zip -r ../team-4-load-to-db-production.zip .  
