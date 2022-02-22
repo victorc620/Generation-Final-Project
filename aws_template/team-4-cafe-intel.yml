@@ -49,7 +49,7 @@ Resources:
               - "SQS:SendMessage"
               - "SQS:RecieveMessage"
             Effect: "Allow"
-            Resource: !Ref SQSQueue
+            Resource: !GetAtt SQSQueue.Arn
       Queues: 
         - !Ref SQSQueue
 
