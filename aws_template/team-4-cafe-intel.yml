@@ -16,12 +16,7 @@ Resources:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
             Function: !GetAtt LambdaFunction.Arn
-    
-  SQSQueue:
-    Type: AWS::SQS::Queue
-    Properties:
-      QueueName: team-4-sqs-queue-production
-      
+
   S3Bucket2:  
     Type: AWS::S3::Bucket
     Properties:
@@ -29,7 +24,7 @@ Resources:
       NotificationConfiguration:
         QueueConfigurations:
           - Event: 's3:ObjectCreated:*'
-            Function: 'arn:aws:sqs:eu-west-1:696036660875:team-4-sqs-queue-production'
+            Function: !Ref SQSQueue
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
@@ -39,7 +34,11 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt S3Bucket.Arn
 
-
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: team-4-sqs-queue-production
+      
   # SQSQueuePolicy:
   #   Type: AWS::SQS::QueuePolicy
   #     Properties: 
@@ -100,9 +99,6 @@ Resources:
       Handler: lambda_main_extract_transform.handler
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
-        # ZipFile: |
-        #   def handler(event, context):
-        #     print("Hi")
         S3Bucket: team4-bucket-cf-template
         S3Key: team-4-extract-transform-production.zip
   
@@ -115,10 +111,7 @@ Resources:
       Handler: lambda_main.handler
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
-        ZipFile: |
-          def handler(event, context):
-            print("Hi")
-        # S3Bucket: team4-bucket-cf-template
-        # S3Key: team-4-load-to-db-production.zip
+        S3Bucket: team4-bucket-cf-template
+        S3Key: team-4-load-to-db-production.zip
 
 
