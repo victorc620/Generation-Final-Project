@@ -41,7 +41,8 @@ Resources:
       
   SQSQueuePolicy:
     Type: AWS::SQS::QueuePolicy
-    Queues: !Ref SQSQueue
+    Queues:
+      - !Ref SQSQueue
     Properties:
       PolicyDocument:
         Version: 2012-10-17
