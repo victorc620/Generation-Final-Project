@@ -19,5 +19,5 @@ jobs:
 
       - name: create new cloudformation stack
         run: |
-          aws s3 cp aws_template/cicd-test-cf.yml s3://team4-bucket-cf-template/templates/cicd-test-cf.yml
-          aws cloudformation create-stack --stack-name team-4-cicd --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/templates/cicd-test-cf.yml --region eu-west-1 --capabilities CAPABILITY_IAM
+          aws s3 cp aws_template/team_4_cafe_intel.yml s3://team4-bucket-cf-template/team_4_cafe_intel.yml
+          aws cloudformation create-stack --stack-name team_4_cafe_intel --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/templates/team_4_cafe_intel.yml --region eu-west-1 --capabilities CAPABILITY_IAM

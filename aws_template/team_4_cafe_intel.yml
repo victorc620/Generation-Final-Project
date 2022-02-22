@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  Group 4: Cafe-Intel ETL pipline cloud formation template
+  which includes the following component:
+  - Cloudformation stack: 
+  - S3 Bucket: team-4-data-production, team-4-transformed-data-production
+  - Lambda Function: team-4-extract-transform-production, team-4-load-to-db-production
+  - SQS Queue: team-4-load-to-redshift-queue-production
+
+Resources:
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::696036660875:policy/AmazonSQSInvokeLambdaFunction
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonRedshiftFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/AmazonRedshiftAllCommandsFullAccess
+
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Path: "/"
+      PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/ScopePermissions
+      Policies:
+      - PolicyName: LambdaLogsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: '*'
+      - PolicyName: LambdaS3Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - 's3:*'
+            Resource:
+              - "arn:aws:s3:::team4-just-for-backup/*"
+              - "arn:aws:s3:::team4-just-for-backup"
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: team-4-extract-transform-production
+      Runtime: python3.8
+      Handler: lambda_main.handler
+      Role: !GetAtt LambdaFunctionRole.Arn
+      Code:
+        ZipFile: |
+          def handler(event, context):
+            print(event)
+
+def handler(event, context):
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: team4-cicd-test
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:*
+      #       Function: !GetAtt LambdaFunction.Arn
+
+  S3BucketPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt S3Bucket.Arn
