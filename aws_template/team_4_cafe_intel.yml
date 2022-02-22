@@ -8,6 +8,32 @@ Description: >
   - SQS Queue: team-4-load-to-redshift-queue-production
 
 Resources:
+  S3Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: team-4-data-production
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:*
+      #       Function: !GetAtt LambdaFunction.Arn
+  
+  # S3Bucket2:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     BucketName: team-4-transformed-data-production
+  #     # NotificationConfiguration:
+  #     #   LambdaConfigurations:
+  #     #     - Event: s3:ObjectCreated:*
+  #     #       Function: !GetAtt LambdaFunction.Arn
+
+  S3BucketPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt S3Bucket.Arn
+
   LambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -20,7 +46,6 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
         - arn:aws:iam::aws:policy/AmazonRedshiftAllCommandsFullAccess
-
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -51,36 +76,34 @@ Resources:
             Action:
               - 's3:*'
             Resource:
-              - "arn:aws:s3:::team4-just-for-backup/*"
-              - "arn:aws:s3:::team4-just-for-backup"
+              - "arn:aws:s3:::team4-bucket-cf-template/*"
+              - "arn:aws:s3:::team4-bucket-cf-template"
 
-  LambdaFunction:
+  LambdaFunction1:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: team-4-extract-transform-production
+      Description: Function to load raw csv data, transform them and export to another s3 bucket
       Runtime: python3.8
       Handler: lambda_main.handler
       Role: !GetAtt LambdaFunctionRole.Arn
       Code:
         ZipFile: |
           def handler(event, context):
-            print(event)
+            print("Hi")
+        # S3Bucket: team4-bucket-cf-template
+        # S3Key: team-4-extract-transform-production.zip
+  
+  # LambdaFunction2:
+  #   Typr: AWS::Lambda::Function
+  #   Properties:
+  #     FunctionName: team-4-load-to-db-production
+  #     Description: Recieve message from SQS queue then load csv to redshift database
+  #     Runtime: python3.8
+  #     Handler: lambda_main.handler
+  #     Role: !GetAtt LambdaFunctionRole.Arn
+  #     Code:
+  #       S3Bucket: team4-bucket-cf-template
+  #       S3Key: team-4-load-to-db-production.zip
 
-def handler(event, context):
 
-  S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: team4-cicd-test
-      # NotificationConfiguration:
-      #   LambdaConfigurations:
-      #     - Event: s3:ObjectCreated:*
-      #       Function: !GetAtt LambdaFunction.Arn
-
-  S3BucketPermission:
-    Type: AWS::Lambda::Permission
-    Properties: 
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref LambdaFunction
-      Principal: s3.amazonaws.com
-      SourceArn: !GetAtt S3Bucket.Arn
