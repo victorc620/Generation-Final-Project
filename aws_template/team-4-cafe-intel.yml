@@ -24,7 +24,7 @@ Resources:
       NotificationConfiguration:
         QueueConfigurations:
           - Event: 's3:ObjectCreated:*'
-            Queue: !Ref SQSQueue
+            Queue: !GetAtt SQSQueue
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
