@@ -50,6 +50,8 @@ Resources:
               - "SQS:RecieveMessage"
             Effect: "Allow"
             Resource: !GetAtt SQSQueue.Arn
+            ArnLike:
+              - aws:SourceArn: !GetAtt S3Bucket2.Arn
       Queues: 
         - !Ref SQSQueue
 
