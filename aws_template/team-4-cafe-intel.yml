@@ -34,6 +34,11 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt S3Bucket.Arn
 
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: team-4-sqs-queue-production
+
   LambdaFunctionRole:
     Type: AWS::IAM::Role
     Properties:
