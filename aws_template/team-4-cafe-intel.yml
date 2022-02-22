@@ -95,7 +95,7 @@ Resources:
         # S3Key: team-4-extract-transform-production.zip
   
   LambdaFunction2:
-    Typr: AWS::Lambda::Function
+    Type: AWS::Lambda::Function
     Properties:
       FunctionName: team-4-load-to-db-production
       Description: Recieve message from SQS queue then load csv to redshift database
