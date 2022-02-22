@@ -1,0 +1,37 @@
+name: Create-team4-cloudformation
+
+on:
+  push
+
+jobs:
+  build-lambda-layer:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+    steps:
+      - name: checkout-repo
+        id: checkout-repo
+        uses: actions/checkout@v2
+
+
+      - name: create team-4-extract-transform-production.zip
+        run: |
+          docker run -v "$PWD":/var/task "lambci/lambda:build-python3.8" /bin/sh -c "pip install -r requirements.txt -t package/; exit"
+          cd package
+          zip -r ../team-4-extract-transform-production.zip .   
+          cd ..
+          zip -g team-4-extract-transform-production.zip lambda_main_extract_transform.py
+          zip -g team-4-extract-transform-production.zip lambda_normalisation.py
+      
+      - name: upload team-4-extract-transform-production.zip to s3
+        run: |
+          aws s3 cp team-4-extract-transform-production.zip s3://team4-bucket-cf-template/team-4-extract-transform-production.zip
+
+      - name: upload cloudformation team_4_cafe_intel.yml file
+        run: |
+          aws s3 cp aws_template/team_4_cafe_intel.yml s3://team4-bucket-cf-template/team_4_cafe_intel.yml
+
+      - name: create new stack from team_4_cage_intel.yml
