@@ -87,9 +87,7 @@ def create_product_df(df_transformed: pd.DataFrame):
     product_df = product_df.drop(columns = "order_id")
     product_df = product_df.drop_duplicates(subset=['products'])
     product_df = create_hash_id(product_df , "product_id")
-    product_df = product_df.reindex(columns=["product_id","products","product_price"])
-    product_df["product_price"] = pd.to_numeric(product_df["product_price"], downcast="float")
-    # product_df.set_index("product_id", inplace=True)
+    product_df.set_index("product_id", inplace=True)
     return product_df
 
 def create_location_df(df_transformed: pd.DataFrame):
@@ -97,27 +95,18 @@ def create_location_df(df_transformed: pd.DataFrame):
     loction_array = df_transformed["location"].unique()
     location_df = pd.DataFrame(loction_array, columns= ["location"])
     location_df = create_hash_id(location_df, "cafe_id")
-    location_df = location_df.reindex(columns=["cafe_id","location"])
-    # location_df.set_index("cafe_id",inplace=True)
+    location_df.set_index("cafe_id",inplace=True)
     return location_df
 
-def create_orders_df(df_transformed: pd.DataFrame, location_df):
+def create_orders_df(df_transformed: pd.DataFrame):
     """Generate a orders_df that ready to be uploaded to orders table in database"""
     orders_df = df_transformed[["location","datetime","payment_type","total_price"]]
     orders_df = orders_df.drop_duplicates()
-    orders_df.reset_index(inplace=True)
-    orders_df.rename(columns = {"datetime":"date"}, inplace=True)
-    orders_df = orders_df.merge(location_df, on="location", how="left")
-    orders_df.drop(columns="location", inplace=True)
-    orders_df = orders_df.reindex(columns=["order_id","cafe_id","date","payment_type","total_price"])
     return orders_df
 
-def create_orders_products_df(df_transformed: pd.DataFrame, product_df):
+def create_orders_products_df(df_transformed: pd.DataFrame):
     """Generate a orders_df that ready to be uploaded to orders_products table in database"""
     orders_products_df = df_transformed[["products"]]
     orders_products_df = orders_products_df.groupby(["order_id","products"]).size()
     orders_products_df = orders_products_df.reset_index(name="quantity_purchased")
-    orders_products_df = orders_products_df.merge(product_df, on="products", how="left")
-    orders_products_df.drop(columns = ["products", "product_price"], inplace=True)   
-    orders_products_df = orders_products_df.reindex(columns=["order_id","product_id","quantity_purchased"])
     return orders_products_df

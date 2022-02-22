@@ -99,7 +99,6 @@ def create_location_df(df_transformed: pd.DataFrame):
     location_df = pd.DataFrame(loction_array, columns= ["location"])
     location_df = create_hash_id(location_df, "cafe_id")
     location_df = location_df.reindex(columns=["cafe_id","location"])
-    # location_df.set_index("cafe_id",inplace=True)
     return location_df
 
 def create_orders_df(df_transformed: pd.DataFrame, location_df):
