@@ -26,10 +26,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: team-4-transformed-data-production
-      # NotificationConfiguration:
-      #   QueueConfigurations:
-      #     - Event: 's3:ObjectCreated:*'
-      #       Queue: arn:aws:sqs:eu-west-1:696036660875:team-4-sqs-queue-production
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Queue: !GetAtt SQSQueue.Arn
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
@@ -38,6 +38,20 @@ Resources:
       FunctionName: !Ref LambdaFunction
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt S3Bucket.Arn
+
+  S3EventQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - 
+            Action:
+              - "SQS:SendMessage"
+              - "SQS:RecieveMessage"
+            Effect: "Allow"
+            Resource: 
+      Queues: !Ref SQSQueue
+        - !Ref SQSQueue
 
   LambdaFunctionRole:
     Type: AWS::IAM::Role
