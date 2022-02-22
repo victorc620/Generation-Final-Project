@@ -34,6 +34,6 @@ jobs:
         run: |
           aws s3 cp aws_template/team_4_cafe_intel.yml s3://team4-bucket-cf-template/team_4_cafe_intel.yml
 
-      - name: create new stack from team_4_cage_intel.yml
+      - name: create new stack from team_4_cafe_intel.yml
         run: |
-          aws cloudformation create-stack --stack-name team_4_cafe_intel --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/templates/team_4_cafe_intel.yml --region eu-west-1 --capabilities CAPABILITY_IAM
+          aws cloudformation create-stack --stack-name team-4-cafe-intel --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/templates/team_4_cafe_intel.yml --region eu-west-1 --capabilities CAPABILITY_IAM
