@@ -21,10 +21,10 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: team-4-transformed-data-production
-      # NotificationConfiguration:
-      #   QueueConfigurations:
-      #     - Event: 's3:ObjectCreated:*'
-      #       Function: !Ref SQSQueue
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !Ref SQSQueue
 
   S3BucketPermission:
     Type: AWS::Lambda::Permission
