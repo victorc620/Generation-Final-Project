@@ -39,11 +39,18 @@ Resources:
     Properties:
       QueueName: team-4-sqs-queue-production
       
-  # SQSQueuePolicy:
-  #   Type: AWS::SQS::QueuePolicy
-  #     Properties: 
-  #       PolicyDocument: Json
-  #       Queues: !Ref SQSQueue
+  SQSQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Queues: !Ref SQSQueue
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - 
+            Action:
+              - SQS:SendMessage
+            Effect: 'Allow'
+            Resource: 'arn:aws:sqs:eu-west-1:696036660875:team-4-sqs-queue-production'
 
   LambdaFunctionRole:
     Type: AWS::IAM::Role
