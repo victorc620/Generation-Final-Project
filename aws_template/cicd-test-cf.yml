@@ -1,0 +1,90 @@
+# AWSTemplateFormatVersion: 2010-09-09
+# Description: >
+#   Template to deploy a lambda which is triggered by an S3 event.
+
+# Resources:
+#   LambdaFunctionRole:
+#     Type: AWS::IAM::Role
+#     Properties:
+#       ManagedPolicyArns:
+#         - arn:aws:iam::aws:policy/AmazonRedshiftFullAccess
+#         - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+#         - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+#       AssumeRolePolicyDocument:
+#         Version: '2012-10-17'
+#         Statement:
+#         - Effect: Allow
+#           Principal:
+#             Service:
+#               - lambda.amazonaws.com
+#           Action:
+#             - sts:AssumeRole
+#       Path: "/"
+#       PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/ScopePermissions
+#       Policies:
+#       - PolicyName: LambdaLogsPolicy
+#         PolicyDocument:
+#           Version: '2012-10-17'
+#           Statement:
+#           - Effect: Allow
+#             Action:
+#               - logs:CreateLogGroup
+#               - logs:CreateLogStream
+#               - logs:PutLogEvents
+#             Resource: '*'
+#       - PolicyName: LambdaS3Policy
+#         PolicyDocument:
+#           Version: '2012-10-17'
+#           Statement:
+#           - Effect: Allow
+#             Action:
+#               - 's3:*'
+#             Resource:
+#               - "arn:aws:s3:::team4-just-for-backup/*"
+#               - "arn:aws:s3:::team4-just-for-backup"
+
+#   LambdaFunction:
+#     Type: AWS::Lambda::Function
+#     Properties:
+#       FunctionName: team-4-cicd-test
+#       Runtime: python3.8
+#       Handler: index.handler
+#       Role: !GetAtt LambdaFunctionRole.Arn
+#       Code:
+#         ZipFile: |
+#           import os
+#           import logging
+#           import boto3
+
+#           LOGGER = logging.getLogger()
+#           LOGGER.setLevel(logging.INFO)
+#           def handler(event, context):
+#             LOGGER.info(f'Event structure: {event}')
+            
+#             bucket = event['Records'][0]['s3']['bucket']['name']
+#             key = event['Records'][0]['s3']['object']['key']
+#             filename = os.path.basename(key)
+
+#             client = boto3.client('s3')
+#             s3 = boto3.resource('s3')
+#             s3.meta.client.download_file(bucket, key, f'/tmp/{filename}')
+#             print("Complete function")
+
+#             print(os.listdir('/tmp'))
+
+#   S3Bucket:
+#     Type: AWS::S3::Bucket
+#     Properties:
+#       BucketName: team4-cicd-test
+#       # NotificationConfiguration:
+#       #   LambdaConfigurations:
+#       #     - Event: s3:ObjectCreated:*
+#       #       Function: !GetAtt LambdaFunction.Arn
+
+#   S3BucketPermission:
+#     Type: AWS::Lambda::Permission
+#     Properties: 
+#       Action: lambda:InvokeFunction
+#       FunctionName: !Ref LambdaFunction
+#       Principal: s3.amazonaws.com
+#       SourceArn: !GetAtt S3Bucket.Arn
