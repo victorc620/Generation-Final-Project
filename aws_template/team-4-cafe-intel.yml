@@ -92,6 +92,8 @@ Resources:
       Runtime: python3.8
       Handler: lambda_main_extract_transform.handler
       Role: !GetAtt LambdaFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 120
       Code:
         S3Bucket: team4-bucket-cf-template
         S3Key: team-4-extract-transform-production.zip
@@ -104,6 +106,8 @@ Resources:
       Runtime: python3.8
       Handler: lambda_main_load_to_db.handler
       Role: !GetAtt LambdaFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 120
       Code:
         S3Bucket: team4-bucket-cf-template
         S3Key: team-4-load-to-db-production.zip
