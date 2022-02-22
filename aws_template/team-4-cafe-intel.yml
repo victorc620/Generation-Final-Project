@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: >
+Description: |
   Group 4: Cafe-Intel ETL pipline cloud formation template
   which includes the following component:
   - Cloudformation stack: 
@@ -8,7 +8,7 @@ Description: >
   - SQS Queue: team-4-load-to-redshift-queue-production
 
 Resources:
-  S3Bucket1:
+  S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: team-4-data-production
@@ -79,7 +79,7 @@ Resources:
               - "arn:aws:s3:::team4-bucket-cf-template/*"
               - "arn:aws:s3:::team4-bucket-cf-template"
 
-  LambdaFunction1:
+  LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: team-4-extract-transform-production
