@@ -1,4 +1,4 @@
-name: Create-team4-cloudformation
+name: update-team4-cloudformation-stack
 
 on:
   push
