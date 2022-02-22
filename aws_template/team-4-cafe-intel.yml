@@ -17,6 +17,11 @@ Resources:
           - Event: s3:ObjectCreated:*
             Function: !GetAtt LambdaFunction.Arn
 
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: team-4-sqs-queue-production
+
   S3Bucket2:  
     Type: AWS::S3::Bucket
     Properties:
@@ -33,11 +38,6 @@ Resources:
       FunctionName: !Ref LambdaFunction
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt S3Bucket.Arn
-
-  SQSQueue:
-    Type: AWS::SQS::Queue
-    Properties:
-      QueueName: team-4-sqs-queue-production
 
   LambdaFunctionRole:
     Type: AWS::IAM::Role
