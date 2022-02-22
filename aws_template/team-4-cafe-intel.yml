@@ -57,27 +57,27 @@ Resources:
             - sts:AssumeRole
       Path: "/"
       PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/ScopePermissions
-      Policies:
-      - PolicyName: LambdaLogsPolicy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Resource: '*'
-      - PolicyName: LambdaS3Policy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-              - 's3:*'
-            Resource:
-              - "arn:aws:s3:::team4-bucket-cf-template/*"
-              - "arn:aws:s3:::team4-bucket-cf-template"
+      # Policies:
+      # - PolicyName: LambdaLogsPolicy
+      #   PolicyDocument:
+      #     Version: '2012-10-17'
+      #     Statement:
+      #     - Effect: Allow
+      #       Action:
+      #         - logs:CreateLogGroup
+      #         - logs:CreateLogStream
+      #         - logs:PutLogEvents
+      #       Resource: '*'
+      # - PolicyName: LambdaS3Policy
+      #   PolicyDocument:
+      #     Version: '2012-10-17'
+      #     Statement:
+      #     - Effect: Allow
+      #       Action:
+      #         - 's3:*'
+      #       Resource:
+      #         - "arn:aws:s3:::team4-bucket-cf-template/*"
+      #         - "arn:aws:s3:::team4-bucket-cf-template"
 
   LambdaFunction:
     Type: AWS::Lambda::Function
