@@ -19,13 +19,13 @@ def handler(event, context):
     # print("CONTEXT")
     # print(context)
     
-    # sqs_msg = event['Records'][0]["body"]
-    # sqs_msg = json.loads(sqs_msg)
+    sqs_msg = event['Records'][0]["body"]
+    sqs_msg = json.loads(sqs_msg)
     
     # s3_bucket_name = sqs_msg["Records"][0]["s3"]["bucket"]["name"]
     # s3_file_key = sqs_msg["Records"][0]["s3"]["object"]["key"]
     
-
+    print(sqs_msg)
     # filename = s3_file_key
     # filename_without_time = s3_file_key.split(".")[0]
     # file_type = filename.split(".")[-1]
