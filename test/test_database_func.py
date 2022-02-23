@@ -1,5 +1,5 @@
 import sys
-sys.path.append("C:/Users/abali/OneDrive/Desktop/Group project")
+sys.path.append("/home/runner/work/team-4-project/team-4-project")
 from lambda_database_func import *
 import psycopg2
 from pandas.testing import assert_frame_equal
