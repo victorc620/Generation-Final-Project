@@ -36,12 +36,12 @@ def insert_value(table_name, filename, s3_bucket_name):
     """
     execture PostgreSQL command to insert data to redshift database
     """
+    connection = connect()
+    connection.autocommit = True
+    cursor = connection.cursor()
+    print("Database connected")
 
     try:
-        connection = connect()
-        connection.autocommit = True
-        cursor = connection.cursor()
-        print("Database connected")
 
         if table_name == "cafe":
             try:
@@ -163,8 +163,8 @@ def insert_value(table_name, filename, s3_bucket_name):
             except Exception as e:
                 print(f"Insert Failed, error: {e}")
 
-    except:
-        print("ERROR")
+    except Exception as e:
+        print(f"ERROR: {e}")
         
     finally:
         cursor.close()
