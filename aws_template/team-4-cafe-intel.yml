@@ -49,9 +49,7 @@ Resources:
           - Effect: "Allow"
             Principal:
               AWS: "*"
-            Action:
-              - "SQS:SendMessage"
-              - "SQS:RecieveMessage"
+            Action: "SQS:SendMessage"
             Resource: "*"
             Condition:
               ArnLike:
