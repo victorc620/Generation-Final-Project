@@ -48,10 +48,10 @@ def handler(event, context):
     #     elif filename_without_time == "orders_products_df":
     #         insert_value("orders_products", filename, s3_bucket_name)
     
-    else:
-        print(f"file type is {file_type} instead of csv, nothing loaded to redshift.")
-        print(f"s3_bucket_name: {s3_bucket_name}")
-        print(f"s3_file_key: {s3_file_key}")
+    # else:
+    #     print(f"file type is {file_type} instead of csv, nothing loaded to redshift.")
+    #     print(f"s3_bucket_name: {s3_bucket_name}")
+    #     print(f"s3_file_key: {s3_file_key}")
     
     print("Done")
 
