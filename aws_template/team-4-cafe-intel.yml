@@ -46,11 +46,16 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Action:
+          - Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action:
               - "SQS:SendMessage"
               - "SQS:RecieveMessage"
-            Effect: "Allow"
-            Resource: !GetAtt SQSQueue.Arn
+            Resource: "*"
+            Condition:
+              ArnLike:
+                aws:SourceArn: "arn:aws:s3:::team-4-transformed-data-production
       Queues: 
         - !Ref SQSQueue
 
