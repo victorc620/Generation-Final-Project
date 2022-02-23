@@ -44,7 +44,7 @@ Resources:
     Type: AWS::SQS::QueuePolicy
     Properties:
       PolicyDocument:
-      Version: "2012-10-17"
+        Version: "2012-10-17"
         Statement:
           - Action:
               - "SQS:SendMessage"
