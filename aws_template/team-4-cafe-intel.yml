@@ -24,7 +24,7 @@ Resources:
 
   S3Bucket2:  
     Type: AWS::S3::Bucket
-    DependsOn: SQSQueue
+    DependsOn: S3EventQueuePolicy
     Properties:
       BucketName: team-4-transformed-data-production
       NotificationConfiguration:
@@ -44,12 +44,15 @@ Resources:
     Type: AWS::SQS::QueuePolicy
     Properties:
       PolicyDocument:
+      Version: "2012-10-17"
         Statement:
           - 
             Action:
               - "SQS:SendMessage"
               - "SQS:RecieveMessage"
             Effect: "Allow"
+            Principal:
+              AWS: "*"
             Resource: !GetAtt SQSQueue.Arn
       Queues: 
         - !Ref SQSQueue
