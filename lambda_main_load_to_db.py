@@ -7,12 +7,7 @@ def handler(event, context):
     
     s3_client = boto3.client('s3')
     s3 = boto3.resource('s3')
-    
-    print("~~~~~~~~~~~~~~")
-    
-    print("EVENT")
-    print(event)
-    
+        
     sqs_msg = event['Records'][0]["body"]
     sqs_msg = json.loads(sqs_msg)
     
