@@ -8,18 +8,10 @@ def handler(event, context):
     s3_client = boto3.client('s3')
     s3 = boto3.resource('s3')
     
-    # sqs_client = boto3.client('sqs')
-    # sqs_message = sqs_client.recieve_message(QueueUrl = "https://sqs.eu-west-1.amazonaws.com/696036660875/team-4-sqs-queue-production")
-    # print("SQS MESSAGE")
-    # print(sqs_message)
-    
-    print("zzzzz")
+    print("~~~~~~~~~~~~~~")
     
     print("EVENT")
     print(event)
-    
-    # print("CONTEXT")
-    # print(context)
     
     sqs_msg = event['Records'][0]["body"]
     sqs_msg = json.loads(sqs_msg)

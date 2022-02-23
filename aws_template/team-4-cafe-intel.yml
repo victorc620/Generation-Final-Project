@@ -137,6 +137,11 @@ Resources:
       Code:
         S3Bucket: team4-bucket-cf-template
         S3Key: !Ref LambdaFunction2Key
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0ffebdada773368d5
+        SubnetIds:
+          - subnet-094bb267969b977e2
 
   LambdaFunctionEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping

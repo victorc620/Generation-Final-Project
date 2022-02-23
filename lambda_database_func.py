@@ -36,6 +36,7 @@ def insert_value(table_name, filename, s3_bucket_name):
     """
     execture PostgreSQL command to insert data to redshift database
     """
+    print("enter insert_value function")
     connection = connect()
     connection.autocommit = True
     cursor = connection.cursor()
