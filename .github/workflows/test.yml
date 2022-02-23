@@ -21,11 +21,12 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
-      - name: Install Pytest
+      - name: Install dependencies needed to run tests
         run: |
           python -m pip install --upgrade pip
-          pip install pytest 
-          echo pytest installed sucessfully 
+          pip install -r requirements.txt
+  
+      
 
       - name: execute tests 
         run: |
