@@ -7,6 +7,14 @@ Description: |
   - Lambda Function: team-4-extract-transform-production, team-4-load-to-db-production
   - SQS Queue: team-4-load-to-redshift-queue-production
 
+Parameters:
+  LambdaFunctionKey: 
+    Type: String
+    Description: team-4-extract-transform-production zip file name  
+  LambdaFunction2Key: 
+    Type: String
+    Description: team-4-load-to-db-production zip file name  
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -114,7 +122,7 @@ Resources:
       Timeout: 120
       Code:
         S3Bucket: team4-bucket-cf-template
-        S3Key: team-4-extract-transform-production.zip
+        S3Key: !Ref LambdaFunctionKey
   
   LambdaFunction2:
     Type: AWS::Lambda::Function
@@ -128,7 +136,7 @@ Resources:
       Timeout: 300
       Code:
         S3Bucket: team4-bucket-cf-template
-        S3Key: team-4-load-to-db-production.zip
+        S3Key: !Ref LambdaFunction2Key
 
   LambdaFunctionEventSourceMapping:
     Type: AWS::Lambda::EventSourceMapping
