@@ -44,125 +44,125 @@ def insert_value(table_name, filename):
         print("Database connected")
         print(filename)
 
-        if table_name == "cafe":
-            try:
-                sql = """
-                CREATE TEMP TABLE cafe_temp(
-                cafe_id VARCHAR(256),
-                location VARCHAR(256)
-                );"""
-                cursor.execute(sql)
+        # if table_name == "cafe":
+        #     try:
+        #         sql = """
+        #         CREATE TEMP TABLE cafe_temp(
+        #         cafe_id VARCHAR(256),
+        #         location VARCHAR(256)
+        #         );"""
+        #         cursor.execute(sql)
                 
-                sql = f"""
-                COPY cafe_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
-                cursor.execute(sql)
+        #         sql = f"""
+        #         COPY cafe_temp
+        #         from 's3://team4-transformed-data-bucket/{filename}' 
+        #         iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
+        #         CSV IGNOREHEADER 1;
+        #         """
+        #         cursor.execute(sql)
                 
-                sql = "LOCK cafe;"
-                cursor.execute(sql)
+        #         sql = "LOCK cafe;"
+        #         cursor.execute(sql)
                 
-                sql = """INSERT INTO cafe SELECT t.* FROM cafe_temp t
-                        LEFT JOIN cafe c ON t.cafe_id = c.cafe_id
-                        WHERE c.cafe_id IS NULL;"""
-                cursor.execute(sql)
+        #         sql = """INSERT INTO cafe SELECT t.* FROM cafe_temp t
+        #                 LEFT JOIN cafe c ON t.cafe_id = c.cafe_id
+        #                 WHERE c.cafe_id IS NULL;"""
+        #         cursor.execute(sql)
                     
-                print("Cafe Successfully Inserted~~!")
+        #         print("Cafe Successfully Inserted~~!")
                     
-            except Exception as e:
-                print(f"Insert Failed, error: {e}")
+        #     except Exception as e:
+        #         print(f"Insert Failed, error: {e}")
             
-        elif table_name == "products":
-            try:
-                sql = """
-                    CREATE TEMP TABLE products_temp(
-                    product_id VARCHAR(256) NOT NULL,
-                    products VARCHAR(256) NOT NULL,
-                    product_price DOUBLE PRECISION NOT NULL
-                    );"""
-                cursor.execute(sql)
+        # elif table_name == "products":
+        #     try:
+        #         sql = """
+        #             CREATE TEMP TABLE products_temp(
+        #             product_id VARCHAR(256) NOT NULL,
+        #             products VARCHAR(256) NOT NULL,
+        #             product_price DOUBLE PRECISION NOT NULL
+        #             );"""
+        #         cursor.execute(sql)
                 
-                sql = f"""
-                COPY products_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
-                cursor.execute(sql)
+        #         sql = f"""
+        #         COPY products_temp
+        #         from 's3://team4-transformed-data-bucket/{filename}' 
+        #         iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
+        #         CSV IGNOREHEADER 1;
+        #         """
+        #         cursor.execute(sql)
 
-                sql = "LOCK products;"
-                cursor.execute(sql)
+        #         sql = "LOCK products;"
+        #         cursor.execute(sql)
                 
-                sql = """INSERT INTO products SELECT t.* FROM products_temp t
-                        LEFT JOIN products p ON t.product_id = p.product_id
-                        WHERE p.product_id IS NULL;"""
-                cursor.execute(sql)
+        #         sql = """INSERT INTO products SELECT t.* FROM products_temp t
+        #                 LEFT JOIN products p ON t.product_id = p.product_id
+        #                 WHERE p.product_id IS NULL;"""
+        #         cursor.execute(sql)
                     
-                print("Products Successfully Inserted~~!")
+        #         print("Products Successfully Inserted~~!")
                     
-            except Exception as e:
-                print(f"Insert Failed, error: {e}")
+        #     except Exception as e:
+        #         print(f"Insert Failed, error: {e}")
         
-        elif table_name == "orders":
-            try:
-                sql = """
-                CREATE TEMP TABLE orders_temp(
-                order_id VARCHAR(256) NOT NULL,
-                cafe_id VARCHAR(256) NOT NULL,
-                date TIMESTAMP without time zone,
-                payment_type VARCHAR(256) NOT NULL,
-                total_price double precision NOT NULL
-                );"""
-                cursor.execute(sql)
+        # elif table_name == "orders":
+        #     try:
+        #         sql = """
+        #         CREATE TEMP TABLE orders_temp(
+        #         order_id VARCHAR(256) NOT NULL,
+        #         cafe_id VARCHAR(256) NOT NULL,
+        #         date TIMESTAMP without time zone,
+        #         payment_type VARCHAR(256) NOT NULL,
+        #         total_price double precision NOT NULL
+        #         );"""
+        #         cursor.execute(sql)
 
-                sql = f"""
-                COPY orders_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
-                cursor.execute(sql)
+        #         sql = f"""
+        #         COPY orders_temp
+        #         from 's3://team4-transformed-data-bucket/{filename}' 
+        #         iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
+        #         CSV IGNOREHEADER 1;
+        #         """
+        #         cursor.execute(sql)
 
             
-                sql = """INSERT INTO orders SELECT t.* FROM orders_temp t
-                    LEFT JOIN orders o ON t.order_id = o.order_id
-                    WHERE o.order_id IS NULL;"""
-                cursor.execute(sql)
+        #         sql = """INSERT INTO orders SELECT t.* FROM orders_temp t
+        #             LEFT JOIN orders o ON t.order_id = o.order_id
+        #             WHERE o.order_id IS NULL;"""
+        #         cursor.execute(sql)
                     
-                print("Orders Successfully Inserted~~!")
+        #         print("Orders Successfully Inserted~~!")
                     
-            except Exception as e:
-                print(f"Insert Failed, error: {e}")
+        #     except Exception as e:
+        #         print(f"Insert Failed, error: {e}")
                 
-        elif table_name == "orders_products":
-            try:
-                sql ="""
-                    CREATE TEMP TABLE orders_products_temp (
-                    order_id VARCHAR(256) NOT NULL,
-                    product_id VARCHAR(256) NOT NULL,
-                    quantity_purchased INT
-                    );"""
-                cursor.execute(sql)
+        # elif table_name == "orders_products":
+        #     try:
+        #         sql ="""
+        #             CREATE TEMP TABLE orders_products_temp (
+        #             order_id VARCHAR(256) NOT NULL,
+        #             product_id VARCHAR(256) NOT NULL,
+        #             quantity_purchased INT
+        #             );"""
+        #         cursor.execute(sql)
 
-                sql = f"""
-                COPY orders_products_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
-                iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
-                CSV IGNOREHEADER 1;
-                """
-                cursor.execute(sql)
+        #         sql = f"""
+        #         COPY orders_products_temp
+        #         from 's3://team4-transformed-data-bucket/{filename}' 
+        #         iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
+        #         CSV IGNOREHEADER 1;
+        #         """
+        #         cursor.execute(sql)
             
-                sql = """INSERT INTO orders_products SELECT t.* FROM orders_products_temp t
-                    LEFT JOIN orders_products op ON t.order_id = op.order_id
-                    WHERE op.order_id IS NULL;"""
-                cursor.execute(sql)
+        #         sql = """INSERT INTO orders_products SELECT t.* FROM orders_products_temp t
+        #             LEFT JOIN orders_products op ON t.order_id = op.order_id
+        #             WHERE op.order_id IS NULL;"""
+        #         cursor.execute(sql)
         
-                print("Orders_Products Successfully Inserted~~!")
+        #         print("Orders_Products Successfully Inserted~~!")
                 
-            except Exception as e:
-                print(f"Insert Failed, error: {e}")
+        #     except Exception as e:
+        #         print(f"Insert Failed, error: {e}")
 
     except:
         print("ERROR")
