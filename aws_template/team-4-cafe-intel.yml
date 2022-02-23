@@ -46,13 +46,10 @@ Resources:
       PolicyDocument:
       Version: "2012-10-17"
         Statement:
-          - 
-            Action:
+          - Action:
               - "SQS:SendMessage"
               - "SQS:RecieveMessage"
             Effect: "Allow"
-            Principal:
-              AWS: "*"
             Resource: !GetAtt SQSQueue.Arn
       Queues: 
         - !Ref SQSQueue
