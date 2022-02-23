@@ -1,7 +1,8 @@
+from cmath import nan
 import sys
 sys.path.append("C:/Users/abali/OneDrive/Desktop/Group project")
-from data_normalisation_func import *
-from pandas.testing import assert_frame_equal
+from lambda_normalisation import *
+from pandas.testing import assert_frame_equal, assert_index_equal
 
 #---------------------------------------------------------------------------------------------------
 
@@ -114,8 +115,8 @@ def test_clean_spaces():
 
 def test_create_product_df():
     #assemble
-    ind = pd.Index(['test'], name='product_id')
-    df = pd.DataFrame({'products': ['test'], 'product_price': [0]}, index=ind)
+    # ind = pd.Index(['test'], name='product_id')
+    df = pd.DataFrame({'product_id': ['f6f4061a1bddc1c04d8109b39f581270'],'products': ['test'], 'product_price': [0]})
     expected = df
     #act 
     ind1 = pd.Index([0], name='order_id')
@@ -123,7 +124,7 @@ def test_create_product_df():
     actual = create_product_df(df1)
     #assert 
     """droped index here because it's impossible to assert a hashed value"""
-    assert_frame_equal(expected.reset_index(drop=True), actual.reset_index(drop=True))
+    assert_frame_equal(expected.reset_index(drop=True), actual.reset_index(drop=True), check_dtype=False)
 
 #----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -131,8 +132,7 @@ def test_create_location_df():
     #assemble
     ind = pd.Index(['test'], name='cafe_id')
     df = pd.DataFrame({'datetime':['0000-00-00 00:00:00'], 'location': ['test'], 'products':['test'], 'total_price':[0], 'payment_type':['test'], 'product_price':[0]}, index=ind)
-    edf = pd.DataFrame({'location': ['test']}, index=ind)
-    expected = edf
+    expected = pd.DataFrame({'cafe_id': ['098f6bcd4621d373cade4e832627b4f6'], 'location': ['test']})
     #act
     actual = create_location_df(df)
     #assert
@@ -144,11 +144,12 @@ def test_create_location_df():
 def test_create_orders_df():
     #assemble 
     ind = pd.Index([0], name='cafe_id')
-    expected = pd.DataFrame({'location':['London'], 'datetime':['01-01-2021'], 'payment_type':['cash'], 'total_price':[12]}, index=ind)
+    expected = pd.DataFrame({'location':['test'], 'datetime':['01-01-2021'], 'payment_type':['cash'], 'total_price':[12]}, index=ind)
     ind1 = pd.Index([0, 1], name='cafe_id')
     df = pd.DataFrame({'location':['London', 'London'], 'datetime':['01-01-2021', '01-01-2021'], 'payment_type':['cash', 'cash'], 'total_price':[12, 12]}, index=ind1)
     #act
-    result = create_orders_df(df)
+    location_df = pd.DataFrame({'cafe_id': ['098f6bcd4621d373cade4e832627b4f6'], 'location': ['test']})
+    result = create_orders_df(df, location_df)
     #assert
     assert_frame_equal(expected, result)
     
@@ -157,12 +158,13 @@ def test_create_orders_df():
 def test_create_orders_products_df():
     #assemble 
     ind = pd.Index([0], name=None)
-    df = pd.DataFrame({'order_id': ['test'], 'products': ['test'], 'quantity_purchased': [2]}, index=ind)
+    df = pd.DataFrame({'order_id': ['test'], 'product_id': ['f6f4061a1bddc1c04d8109b39f581270'], 'quantity_purchased': [2]}, index=ind)
     expected = df
     #act
     ind1 = pd.Index(['test', 'test'], name='order_id')
     df1 = pd.DataFrame({'datetime': ['0000-00-00 00:00:00', '0000-00-00 00:00:00'], 'location': ['test', 'test'], 'products': ['test', 'test'], 'payment_type': ['test', 'test'], 'product_price': [1, 1]}, index=ind1)
-    actual = create_orders_products_df(df1)
+    product_df = pd.DataFrame({'product_id': ['f6f4061a1bddc1c04d8109b39f581270'],'products': ['test'], 'product_price': [0]})
+    actual = create_orders_products_df(df1, product_df=product_df)
     #assert 
     assert_frame_equal(expected, actual)
     
@@ -171,10 +173,11 @@ def test_create_orders_products_df():
 def test_create_orders_df():
     #assemble 
     ind = pd.Index([0], name='cafe_id')
-    expected = pd.DataFrame({'location':['London'], 'datetime':['01-01-2021'], 'payment_type':['cash'], 'total_price':[12]}, index=ind)
+    expected = pd.DataFrame({'order_id': [nan],'cafe_id':[nan], 'date':['01-01-2021'], 'payment_type':['cash'], 'total_price':[12]})
     ind1 = pd.Index([0, 1], name='cafe_id')
     df = pd.DataFrame({'location':['London', 'London'], 'datetime':['01-01-2021', '01-01-2021'], 'payment_type':['cash', 'cash'], 'total_price':[12, 12]}, index=ind1)
     #act
-    result = create_orders_df(df)
+    location_df = pd.DataFrame({'cafe_id': ['098f6bcd4621d373cade4e832627b4f6'], 'location': ['test']})
+    result = create_orders_df(df, location_df=location_df)
     #assert
-    assert_frame_equal(expected, result)
+    assert_frame_equal(expected, result, check_dtype=False)
