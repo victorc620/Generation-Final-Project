@@ -41,7 +41,7 @@ def handler(event, context):
     orders_products_csv_path = write_csv_to_tmp(orders_products_df, 'orders_products_df.csv', filename_location_date)
     
       #3. send vs(s) to s3 bucket (team4-tranformed-data)
-    bucket = 'team4-transformed-data-bucket'
+    bucket = 'team-4-extract-transform-production'
     upload_file(product_csv_path, bucket)
     upload_file(location_csv_path, bucket)
     upload_file(orders_csv_path, bucket)
