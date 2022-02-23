@@ -32,17 +32,17 @@ def connect():
     return conn
 
 # @backoff.on_exception(backoff.expo, Exception, on_backoff=backoff_hdlr)
-def insert_value(table_name, filename):
+def insert_value(table_name, filename, s3_bucket_name):
     """
     execture PostgreSQL command to insert data to redshift database
     """
+    print("enter insert_value function")
+    connection = connect()
+    connection.autocommit = True
+    cursor = connection.cursor()
+    print("Database connected")
 
     try:
-        connection = connect()
-        connection.autocommit = True
-        cursor = connection.cursor()
-        print("Database connected")
-        print(filename)
 
         if table_name == "cafe":
             try:
@@ -55,7 +55,7 @@ def insert_value(table_name, filename):
                 
                 sql = f"""
                 COPY cafe_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
+                from 's3://{s3_bucket_name}/{filename}' 
                 iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
                 CSV IGNOREHEADER 1;
                 """
@@ -86,7 +86,7 @@ def insert_value(table_name, filename):
                 
                 sql = f"""
                 COPY products_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
+                from 's3://{s3_bucket_name}/{filename}' 
                 iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
                 CSV IGNOREHEADER 1;
                 """
@@ -119,7 +119,7 @@ def insert_value(table_name, filename):
 
                 sql = f"""
                 COPY orders_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
+                from 's3://{s3_bucket_name}/{filename}' 
                 iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
                 CSV IGNOREHEADER 1;
                 """
@@ -148,7 +148,7 @@ def insert_value(table_name, filename):
 
                 sql = f"""
                 COPY orders_products_temp
-                from 's3://team4-transformed-data-bucket/{filename}' 
+                from 's3://{s3_bucket_name}/{filename}' 
                 iam_role 'arn:aws:iam::696036660875:role/RedshiftS3Role'
                 CSV IGNOREHEADER 1;
                 """
@@ -164,8 +164,8 @@ def insert_value(table_name, filename):
             except Exception as e:
                 print(f"Insert Failed, error: {e}")
 
-    except:
-        print("ERROR")
+    except Exception as e:
+        print(f"ERROR: {e}")
         
     finally:
         cursor.close()

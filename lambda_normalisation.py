@@ -134,6 +134,7 @@ def upload_file(file_name, bucket):
     s3_client = boto3.client('s3')
     key = file_name.split("/")[-1]
     print(key)
+    print(bucket)
     s3_client.upload_file(file_name, bucket, key)
 
 def create_time_stamp_filename(file, filename_location_date):

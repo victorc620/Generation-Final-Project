@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Group 4: Cafe-Intel ETL pipline cloud formation template
+  which includes the following component:
+  - Cloudformation stack: 
+  - S3 Bucket: team-4-data-production, team-4-transformed-data-production
+  - Lambda Function: team-4-extract-transform-production, team-4-load-to-db-production
+  - SQS Queue: team-4-load-to-redshift-queue-production
+
+Parameters:
+  LambdaFunctionKey: 
+    Type: String
+    Description: team-4-extract-transform-production zip file name  
+  LambdaFunction2Key: 
+    Type: String
+    Description: team-4-load-to-db-production zip file name  
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: team-4-data-production
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt LambdaFunction.Arn
+
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: team-4-sqs-queue-production
+
+  S3Bucket2:  
+    Type: AWS::S3::Bucket
+    DependsOn: S3EventQueuePolicy
+    Properties:
+      BucketName: team-4-transformed-data-production
+      NotificationConfiguration:
+        QueueConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Queue: !GetAtt SQSQueue.Arn
+
+  S3BucketPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref LambdaFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt S3Bucket.Arn
+
+  S3EventQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action: "SQS:SendMessage"
+            Resource: "*"
+            Condition:
+              ArnLike:
+                aws:SourceArn: arn:aws:s3:::team-4-transformed-data-production
+      Queues: 
+        - !Ref SQSQueue
+
+  LambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::696036660875:policy/AmazonSQSInvokeLambdaFunction
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonRedshiftFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/AmazonRedshiftAllCommandsFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Path: "/"
+      PermissionsBoundary: !Sub arn:aws:iam::${AWS::AccountId}:policy/ScopePermissions
+      Policies:
+      - PolicyName: LambdaLogsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: '*'
+      - PolicyName: LambdaS3Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - 's3:*'
+            Resource:
+              - "arn:aws:s3:::team4-bucket-cf-template/*"
+              - "arn:aws:s3:::team4-bucket-cf-template"
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: team-4-extract-transform-production
+      Description: Function to load raw csv data, transform them and export to another s3 bucket
+      Runtime: python3.8
+      Handler: lambda_main_extract_transform.handler
+      Role: !GetAtt LambdaFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 120
+      Code:
+        S3Bucket: team4-bucket-cf-template
+        S3Key: !Ref LambdaFunctionKey
+  
+  LambdaFunction2:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: team-4-load-to-db-production
+      Description: Recieve message from SQS queue then load csv to redshift database
+      Runtime: python3.8
+      Handler: lambda_main_load_to_db.handler
+      Role: !GetAtt LambdaFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 300
+      Code:
+        S3Bucket: team4-bucket-cf-template
+        S3Key: !Ref LambdaFunction2Key
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0ffebdada773368d5
+        SubnetIds:
+          - subnet-094bb267969b977e2
+
+  LambdaFunctionEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 1
+      Enabled: true
+      EventSourceArn: !GetAtt SQSQueue.Arn
+      FunctionName: !GetAtt LambdaFunction2.Arn
