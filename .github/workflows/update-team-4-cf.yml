@@ -27,18 +27,12 @@ jobs:
           zip -g team-4-extract-transform-production.zip lambda_normalisation.py
           zip -g team-4-load-to-db-production.zip lambda_main_load_to_db.py
           zip -g team-4-load-to-db-production.zip lambda_database_func.py
-      
-      # - name: upload team-4-extract-transform-production.zip to s3
-      #   run: |
+
           KEY1=team-4-et_$(date +"%s").zip
           aws s3 cp team-4-extract-transform-production.zip s3://team4-bucket-cf-template/$KEY1
 
-      # - name: upload team-4-load-to-db-production.zip to s3
-      #   run: |
           KEY2=team-4-db_$(date +"%s").zip
           aws s3 cp team-4-load-to-db-production.zip s3://team4-bucket-cf-template/$KEY2
 
-      # - name: upload & create cloudformation team_4_cafe_intel.yml file
-      #   run: |
           aws s3 cp aws_template/team-4-cafe-intel.yml s3://team4-bucket-cf-template/team-4-cafe-intel.yml
           aws cloudformation update-stack --stack-name team-4-cafe-intel --template-url https://team4-bucket-cf-template.s3.eu-west-1.amazonaws.com/team-4-cafe-intel.yml --region eu-west-1 --parameters ParameterKey=LambdaFunctionKey,ParameterValue=$KEY1 ParameterKey=LambdaFunction2Key,ParameterValue=$KEY2 --capabilities CAPABILITY_IAM
