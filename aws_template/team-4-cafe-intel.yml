@@ -55,7 +55,7 @@ Resources:
             Resource: "*"
             Condition:
               ArnLike:
-                aws:SourceArn: "arn:aws:s3:::team-4-transformed-data-production
+                aws:SourceArn: arn:aws:s3:::team-4-transformed-data-production
       Queues: 
         - !Ref SQSQueue
 
