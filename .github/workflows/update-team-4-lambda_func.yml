@@ -1,4 +1,4 @@
-name: update-team4-cloudformation-stack
+name: update-team4-lambda-func
 
 on:
   push
