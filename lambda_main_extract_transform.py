@@ -34,14 +34,14 @@ def handler(event, context):
     orders_df = create_orders_df(df_transformed, location_df)
     orders_products_df = create_orders_products_df(df_transformed, product_df)
   
-      #2. Covert df into csv in lambda /tmp/ directory 
+    #2. Covert df into csv in lambda /tmp/ directory 
     product_csv_path = write_csv_to_tmp(product_df, 'product_df.csv', filename_location_date)
     location_csv_path = write_csv_to_tmp(location_df, 'location_df.csv', filename_location_date)
     orders_csv_path = write_csv_to_tmp(orders_df, 'orders_df.csv', filename_location_date)
     orders_products_csv_path = write_csv_to_tmp(orders_products_df, 'orders_products_df.csv', filename_location_date)
     
-      #3. send vs(s) to s3 bucket (team4-tranformed-data)
-    bucket = 'team4-transformed-data-bucket'
+    #3. send vs(s) to s3 bucket (team-4-transformed-data-production)
+    bucket = "team-4-transformed-data-production"
     upload_file(product_csv_path, bucket)
     upload_file(location_csv_path, bucket)
     upload_file(orders_csv_path, bucket)
