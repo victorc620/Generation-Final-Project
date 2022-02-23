@@ -35,6 +35,7 @@ jobs:
 
       - name: upload team-4-load-to-db-production.zip to s3
         run: |
+        
           KEY2=team-4-db_$(date +"%s").zip
           aws s3 cp team-4-load-to-db-production.zip s3://team4-bucket-cf-template/$KEY2
 
