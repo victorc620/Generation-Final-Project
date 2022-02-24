@@ -1,0 +1,23 @@
+name: Tests
+on:
+  push:
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Install dependencies needed to run tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: install pytest 
+        run: |
+          pip install pytest 
+        
+        
+      - name: execute tests 
+        run: |
+          pytest test/test_database_func.py test/test_normalisation_func.py
